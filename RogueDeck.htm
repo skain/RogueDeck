@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>RogueDeck</title>
+	<link href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+
+	
+	<style type='text/css'>		
+		div.turn {
+			margin: 10px 0;
+		}
+		
+		div.turn:nth-child(1) {
+			background-color: lightGray;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="row">
+			<h1>RogueDeck</h1>
+		</div>
+		<div class="row">
+			<div id="InputDiv">
+				<div class="form-group">
+					<input type="text" id="InputTb" />
+					<input type="button" value="Do It!" id='ActionBtn' />
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div id="OutputDiv">
+				
+			</div>
+		</div>
+	</div>
+
+
+	<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+	<script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+	<script src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-3.0.0.js"></script>
+	<script type="text/javascript">
+		(function(window) {			
+			var createRogueDeck = function (){
+				var self = this;
+				self.utils = {
+					doorUtils: {
+						getDoors: function(numDoors) {
+							var doors = [];
+							if (numDoors < 1) {
+								numDoors = 1;
+							}
+							for (var i = 0; i < numDoors; i++) {
+								var dir = self.utils.doorUtils.getRandomDirection();
+								doors.push({
+									direction: dir
+								});
+							}
+							
+							return doors;
+						},
+						getRandomDirection: function () {
+							var rnd = self.utils.getRandomNumber(4);
+							switch (rnd) {
+								case 1:
+									return 'North';
+								case 2:
+									return 'East';
+								case 3:
+									return 'South';
+								case 4:
+									return 'West';
+							}
+						},
+						getRandomDoors: function() {
+							return self.utils.doorUtils.getDoors(self.getRandomNumber(4));
+						}
+					},
+					getRandomNumber: function (max) {
+						return Math.floor((Math.random()*max)+1);
+					}
+				};
+			
+				function areaCard(isFirstCard) {
+					var card = {
+						monsters: [],
+						loot: [],
+						doors: [],
+						type: 'room',
+						sizeInt: self.utils.getRandomNumber(10)
+					};
+					
+					card.doors = self.utils.doorUtils.getDoors(Math.floor(card.sizeInt / 2));
+					if (!isFirstCard) {					
+						if (self.utils.getRandomNumber(10) < 7) {
+							card.type = 'hallway';
+						}
+						
+						if (card.type == 'room') {
+							//calculate random loot
+						}
+						
+						//calculate random monsters
+					}
+					
+					if (card.sizeInt < 4) {
+						card.sizeText = 'small';
+					} else if (card.sizeInt < 9) {
+						card.sizeText = 'medium';
+					} else {
+						card.sizeText = 'large';
+					}
+					
+					if (card.type == 'hallway') {
+						switch (card.sizeText) {
+							case 'small':
+								card.sizeText = 'short';
+								break;
+							case 'large':
+								card.sizeText = 'long';
+								break;
+						}
+					}
+					
+					card.directionExists = function (direction) {
+						direction = direction.substr(0,1).toLowerCase();
+						for (var i = 0; i < card.doors.length; i++) {
+							if (card.doors[i].direction.substr(0,1).toLowerCase() == direction) {
+								return true;
+							}
+						}
+						
+						return false;
+					}
+					return card;
+				};
+				
+				self.getAreaCard = function (isFirstCard) {
+					return new areaCard(isFirstCard);
+				}
+			};
+			
+			window.rogueGame = new function () {
+				var self = this;
+				self.playedAreaCards = [];
+				
+				var rogueDeck = new createRogueDeck();
+				
+				self.getCurrentCard = function () {
+					if (self.playedAreaCards.length == 0) {
+						return null;
+					}
+					
+					return self.playedAreaCards[self.playedAreaCards.length - 1];
+				}
+				
+				self.startGameAndGetFirstRoom = function () {
+					self.playedAreaCards = [];
+					self.playedAreaCards.push(rogueDeck.getAreaCard(true));
+				};
+				
+				self.moveToNextArea = function(direction) {
+					var currentCard = self.getCurrentCard();
+					if (currentCard.directionExists(direction)) {
+						self.playedAreaCards.push(rogueDeck.getAreaCard(false));
+						return true;
+					} else {
+						return false;
+					}
+				}
+			};
+		})(window);
+	</script>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			var $output = $('#OutputDiv');
+			var $actionBtn = $('#ActionBtn');
+			var $inputTb = $('#InputTb');
+			function displayCurrentCard() {
+				var currentCard = rogueGame.getCurrentCard();
+				var curOutput = '<div class="turn"><p>You are in a ' + currentCard.sizeText + ' ' + currentCard.type + '</p>';
+				curOutput = curOutput + '<p>';
+				for (var i = 0; i < currentCard.doors.length; i++) {
+					curOutput = curOutput + 'There is a door to the ' + currentCard.doors[i].direction + '<br />';
+				}
+				curOutput = curOutput + '<p></div>';
+				
+				$output.prepend(curOutput);
+			}
+			
+			window.rogueGame.startGameAndGetFirstRoom();
+			displayCurrentCard();
+			
+			$actionBtn.click(function () {
+				var entered = $inputTb.val().toLowerCase();
+				switch (entered) {
+					case 'n':
+					case 'north':
+					case 'e':
+					case 'east':
+					case 's':
+					case 'south':
+					case 'w':
+					case 'west':
+						if (rogueGame.moveToNextArea(entered)) {
+							displayCurrentCard();
+						} else {
+							alert('You can\'t move that direction!');
+						}
+						break;				
+				}
+			});
+		
+		});
+	</script>
+</body>
+</html>
