@@ -6,17 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>RogueDeck</title>
 	<link href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
-
-	
-	<style type='text/css'>		
-		div.turn {
-			margin: 10px 0;
-		}
-		
-		div.turn:nth-child(1) {
-			background-color: lightGray;
-		}
-	</style>
 </head>
 <body>
 	<div class="container">
@@ -32,8 +21,20 @@
 			</div>
 		</div>
 		<div class="row">
-			<div id="OutputDiv">
-				
+			<div class="col-sm-4" id="AreaDiv">
+				<h3>Area</h3>
+				<div data-bind="with: currentAreaCard">
+					<h4 data-bind="text: type"></h4>
+					<ul class="doorsList" data-bind="foreach: doors">
+						<li data-bind="text: 'There is a door to the ' + direction" />
+					</ul>
+				</div>
+			</div>
+			<div class="col-sm-4" id="MonstersDiv">
+				<h3>Monsters</h3>
+			</div>
+			<div class="col-sm-4" id="LootDiv">
+				<h3>Loot</h3>
 			</div>
 		</div>
 	</div>
@@ -42,7 +43,7 @@
 	<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
 	<script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 	<script src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-3.0.0.js"></script>
-	<script type="text/javascript">
+	<script type="text/javascript" id="GameCode">
 		(function(window) {			
 			var createRogueDeck = function (){
 				var self = this;
@@ -145,27 +146,18 @@
 			
 			window.rogueGame = new function () {
 				var self = this;
-				self.playedAreaCards = [];
+				self.currentAreaCard = ko.observable(null);
 				
 				var rogueDeck = new createRogueDeck();
 				
-				self.getCurrentCard = function () {
-					if (self.playedAreaCards.length == 0) {
-						return null;
-					}
-					
-					return self.playedAreaCards[self.playedAreaCards.length - 1];
-				}
-				
 				self.startGameAndGetFirstRoom = function () {
 					self.playedAreaCards = [];
-					self.playedAreaCards.push(rogueDeck.getAreaCard(true));
+					self.currentAreaCard(rogueDeck.getAreaCard(true));
 				};
 				
 				self.moveToNextArea = function(direction) {
-					var currentCard = self.getCurrentCard();
-					if (currentCard.directionExists(direction)) {
-						self.playedAreaCards.push(rogueDeck.getAreaCard(false));
+					if (self.currentAreaCard().directionExists(direction)) {
+						self.currentAreaCard(rogueDeck.getAreaCard(false));
 						return true;
 					} else {
 						return false;
@@ -174,7 +166,7 @@
 			};
 		})(window);
 	</script>
-	<script type="text/javascript">
+	<script type="text/javascript" id="PageCode">
 		$(document).ready(function() {
 			var $output = $('#OutputDiv');
 			var $actionBtn = $('#ActionBtn');
@@ -191,8 +183,8 @@
 				$output.prepend(curOutput);
 			}
 			
-			window.rogueGame.startGameAndGetFirstRoom();
-			displayCurrentCard();
+			rogueGame.startGameAndGetFirstRoom();
+			ko.applyBindings(window.rogueGame);
 			
 			$actionBtn.click(function () {
 				var entered = $inputTb.val().toLowerCase();
@@ -205,9 +197,7 @@
 					case 'south':
 					case 'w':
 					case 'west':
-						if (rogueGame.moveToNextArea(entered)) {
-							displayCurrentCard();
-						} else {
+						if (!rogueGame.moveToNextArea(entered)) {
 							alert('You can\'t move that direction!');
 						}
 						break;				
