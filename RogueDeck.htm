@@ -65,7 +65,7 @@
 			<div class="col-sm-4" id="LootDiv">
 				<h3>Loot</h3>
 				<ul data-bind="foreach: loot, css: { disabled: monsters().length > 0 && loot().length > 0 }">
-					<li>There is a <span data-bind="text:type"></span> here. <a href="javascript:void(0);" data-bind="click:window.rogueGame.takeItem">Take</a></li> 
+					<li><span data-bind="text: droppedBy"></span> <span data-bind="text:type"></span> here. <a href="javascript:void(0);" data-bind="click:window.rogueGame.takeItem">Take</a></li> 
 				</ul>
 			</div>
 		</div>
@@ -125,8 +125,8 @@
 					return Math.floor((Math.random()*max)+1);
 				},
 				calculateHit: function(attack, defense, roll) {
-					console.log('hitcalc: roll: ' + roll + ' att: ' + attack + ' def: ' + defense);
-					return roll > (attack - defense);
+					console.log('hitcalc: roll: ' + roll + ' > (att: ' + attack + ' - def: ' + defense + ')');
+					return roll > (defense - attack);
 				}
 			}
 			var createRogueDeck = function (){
@@ -188,7 +188,7 @@
 						card.type = 'other thing';
 						card.verb = 'use';
 					}
-					
+					card.droppedBy = 'There is a ';
 					return card;
 				}
 				
@@ -237,7 +237,6 @@
 						//calculate random loot
 						if (card.type == 'room') {
 							var numLoot = Math.floor(card.sizeInt / 2);
-							console.log('loot: ' + numLoot);
 							for (var i = 0; i < numLoot; i++) {
 								var lc = getLootCard();
 								if (lc) {
@@ -248,7 +247,6 @@
 						
 						//calculate random monsters
 						var numMonsters = Math.floor(card.sizeInt / 3); //allow for no monsters
-						console.log('monsters: ' + numMonsters);
 						for (var i = 0; i < numMonsters; i++) {
 							var mc = getMonsterCard();
 							if (mc) {
@@ -285,6 +283,12 @@
 						}
 						
 						return false;
+					}
+					
+					card.addMonsterDrop = function(monster) {
+						var lc = getLootCard();
+						lc.droppedBy = monster.name() + ' dropped a ';
+						card.loot.push(lc);
 					}
 					return card;
 				};
@@ -391,6 +395,7 @@
 					if (monster.hitPoints() < 1) {
 						alert('You killed the ' + monster.type);
 						self.currentAreaCard().monsters.remove(monster);
+						self.currentAreaCard().addMonsterDrop(monster);
 					}
 					processEndGame();
 					processTurnCompletion();
