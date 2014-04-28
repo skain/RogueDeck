@@ -13,14 +13,6 @@
 			<h1>RogueDeck</h1>
 		</div>
 		<div class="row">
-			<div id="InputDiv">
-				<div class="form-group">
-					<input type="text" id="InputTb" />
-					<input type="button" value="Do It!" id='ActionBtn' />
-				</div>
-			</div>
-		</div>
-		<div class="row">
 			<div class="col-sm-4" id="AreaDiv">
 				<h3>Area</h3>
 				<div data-bind="with: currentAreaCard">
@@ -35,6 +27,41 @@
 			</div>
 			<div class="col-sm-4" id="LootDiv">
 				<h3>Loot</h3>
+			</div>
+		</div>
+		<div class="row" data-bind="with:player">
+			<h3 data-bind="text: name"></h3>
+			<div class="col-sm-3">
+				<table>
+					<tr>
+						<th>Strength</th>
+						<td data-bind="text: strength"></td>
+					</tr>
+					<tr>
+						<th>Intelligence</th>
+						<td data-bind="text: intelligence"></td>
+					</tr>
+					<tr>
+						<th>Dexterity</th>
+						<td data-bind="text: dexterity"></td>
+					</tr>
+					<tr>
+						<th>Vitality</th>
+						<td data-bind="text: vitality"></td>
+					</tr>
+				</table>
+			</div>
+			<div class="col-sm-3">
+				<table>
+					<tr>
+						<th>Hit Points</th>
+						<td data-bind="text:hitPoints"></td>
+					</tr>
+					<tr>
+						<th>Stomach</th>
+						<td data-bind="text:stomach"></td>
+					</tr>
+				</table>
 			</div>
 		</div>
 	</div>
@@ -147,23 +174,33 @@
 			};
 			var createRoguePlayer = function (name) {
 				var self = this;
-				self.name = name;
-				
+				self.name = ko.observable(name);
+				self.stomach = ko.observable(100);
+				self.strength = ko.observable(window.utils.getRandomNumber(15));
+				self.vitality = ko.observable(window.utils.getRandomNumber(15));
+				self.intelligence = ko.observable(window.utils.getRandomNumber(15));
+				self.dexterity = ko.observable(window.utils.getRandomNumber(15));
+				self.hitPoints = 15 + self.vitality();
 			}
 			window.rogueGame = new function () {
 				var self = this;
+				self.player = new createRoguePlayer("Steve");
 				self.currentAreaCard = ko.observable(null);
 				
 				var rogueDeck = new createRogueDeck();
 				
 				self.startGameAndGetFirstRoom = function () {
-					self.playedAreaCards = [];
 					self.currentAreaCard(rogueDeck.getAreaCard(true));
 				};
+				
+				var processTurnCompletion = function() {
+					self.player.stomach(self.player.stomach() - 1);
+				}
 				
 				self.moveToNextArea = function(direction) {
 					if (self.currentAreaCard().directionExists(direction)) {
 						self.currentAreaCard(rogueDeck.getAreaCard(false));
+						processTurnCompletion();
 						return true;
 					} else {
 						return false;
