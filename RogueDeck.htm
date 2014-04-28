@@ -26,7 +26,7 @@
 				<div data-bind="with: currentAreaCard">
 					<h4 data-bind="text: type"></h4>
 					<ul class="doorsList" data-bind="foreach: doors">
-						<li data-bind="text: 'There is a door to the ' + direction" />
+						<li>There is a door to the <a href="javascript:void(0);" data-bind="text: direction, click:window.rogueGame.tryMoveToNewArea"></a></li>
 					</ul>
 				</div>
 			</div>
@@ -163,6 +163,12 @@
 						return false;
 					}
 				}
+				
+				self.tryMoveToNewArea = function(door) {
+					if (!self.moveToNextArea(door.direction)) {
+						alert('You can\'t move that direction!');
+					}
+				};
 			};
 		})(window);
 	</script>
