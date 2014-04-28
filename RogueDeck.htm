@@ -24,6 +24,12 @@
 			left: 0px;
 			z-index: 99;
 		}
+		div#MessageLogDiv {
+			margin-top: 20px;
+		}
+		div#MessageLogDiv .alert {
+			margin-bottom: 5px;
+		}
 	</style>
 </head>
 <body>
@@ -112,14 +118,16 @@
 				</ul>
 			</div>
 		</div>
-		<div class="row" data-bind="foreach: messageLog().reverse()">
-			<div data-bind="text:$data.message, attr { class: 'alert alert-' + $data.level }"></div>
+		<div class="row" id="MessageLogDiv" data-bind="foreach: messageLog">
+			<div data-bind="attr { class: 'alert alert-' + $data.level }">
+				<div class="col-sm-1"><span class="badge" data-bind="text:$data.index"></span></div><div class="col-sm-11"><span data-bind="text:$data.message"></span></div><div style="clear: both"></div>
+			</div>
 		</div>
 		<div class="row" data-bind="visible: messageLog().length > 0">
 			<a href="javascript:void(0)" data-bind="click: window.rogueGame.clearMessageLog">Clear all messages</a>
 		</div>
 	</div>
-
+<!-- <input type="button" data-bind="click: window.rogueGame.addMessageToLog('Test', 'info')" value="Log" /> -->
 
 	<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
 	<script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
@@ -210,13 +218,16 @@
 							var attackerRoll = window.utils.getRandomNumber(10);
 							this.fightLog('<br />' + attacker.name() + ' rolls ' + attackerRoll + this.fightLog());
 							var dmg = window.utils.calculateHit(attacker.attack, defender.defense, attackerRoll);
+							
 							if (dmg > 0) {
 								//process hit
 								defender.hitPoints(defender.hitPoints() - dmg);
 								this.fightLog('<br />' + defender.name() + ' takes ' + dmg + ' damage.' + this.fightLog());
+								window.rogueGame.addMessageToLog(attacker.name() + ' hits ' + defender.name() + ' for ' + dmg + ' HP of damage.', attacker.isPlayer ? 'success' : 'danger');
 							} else {
 								//process miss
 								this.fightLog('<br />' + attacker.name() + ' misses.' + this.fightLog());
+								window.rogueGame.addMessageToLog(attacker.name() + ' misses ' + defender.name(), attacker.isPlayer ? 'warning' : 'success');
 							}
 						}
 					};
@@ -316,6 +327,7 @@
 				self.lootCards = ko.observableArray();
 				self.attack = self.strength();
 				self.defense = self.dexterity();
+				self.isPlayer = true;
 				
 				self.useLootCard = function(lootCard) {
 					if (self.lootCards.indexOf(lootCard) < 0) {
@@ -344,17 +356,19 @@
 				var self = this;
 				self.currentAreaCard = ko.observable(null);
 				self.player = ko.observable(null);
-				self.messageLog = ko.observableArray();				
+				self.messageLog = ko.observableArray();		
+				var curMessageLogIndex = 0;
 				
 				var rogueDeck = new createRogueDeck();
 				
 				self.addMessageToLog = function (msg, level) {
 					level = level || 'info';
-					if (self.messageLog().length == 4) {
+							
+					curMessageLogIndex++;
+					self.messageLog.unshift({ message: msg, level: level, index: curMessageLogIndex });
+					if (self.messageLog().length == 7) {
 						self.messageLog.pop();
 					}
-					
-					self.messageLog.push({ message: msg, level: level });
 				}
 				
 				self.clearMessageLog = function() {
@@ -382,6 +396,10 @@
 					if (self.currentAreaCard().directionExists(direction)) {
 						processTurnCompletion();
 						self.currentAreaCard(rogueDeck.getAreaCard(false));
+						self.addMessageToLog('You moved ' + direction);
+						if (self.currentAreaCard().monsters().length > 0) {
+							self.addMessageToLog('There are monsters here!', 'danger');
+						}
 						return true;
 					} else {
 						return false;
@@ -395,19 +413,21 @@
 				};
 				
 				self.takeItem = function(lootCard) {
+					self.addMessageToLog('You took the ' + lootCard.type);
 					self.player().lootCards.push(lootCard);
 					self.currentAreaCard().loot.remove(lootCard);
 					processTurnCompletion();
 				};
 				
 				self.useItem = function(lootCard) {
+					self.addMessageToLog('You used the ' + lootCard.type);
 					self.player().useLootCard(lootCard);
 					processTurnCompletion();
 				};
 				
 				var processEndGame = function() {
 					if (self.player().hitPoints() < 1) {
-						window.rogueGame.addMessageToLog('You have died.');
+						window.rogueGame.addMessageToLog('You have died.', 'danger');
 						window.rogueGame.startGameAndGetFirstRoom();
 					}
 				};
