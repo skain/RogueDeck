@@ -64,7 +64,7 @@
 			</div>
 			<div class="col-sm-4" id="LootDiv">
 				<h3>Loot</h3>
-				<ul data-bind="foreach: loot, css: { disabled: monsters().length > 0 && loot().length > 0 }">
+				<ul data-bind="foreach: loot">
 					<li><span data-bind="text: droppedBy"></span> <span data-bind="text:type"></span> here. <a href="javascript:void(0);" data-bind="click:window.rogueGame.takeItem">Take</a></li> 
 				</ul>
 			</div>
@@ -112,6 +112,12 @@
 				</ul>
 			</div>
 		</div>
+		<div class="row" data-bind="foreach: messageLog().reverse()">
+			<div data-bind="text:$data.message, attr { class: 'alert alert-' + $data.level }"></div>
+		</div>
+		<div class="row" data-bind="visible: messageLog().length > 0">
+			<a href="javascript:void(0)" data-bind="click: window.rogueGame.clearMessageLog">Clear all messages</a>
+		</div>
 	</div>
 
 
@@ -125,8 +131,8 @@
 					return Math.floor((Math.random()*max)+1);
 				},
 				calculateHit: function(attack, defense, roll) {
-					console.log('hitcalc: roll: ' + roll + ' > (att: ' + attack + ' - def: ' + defense + ')');
-					return roll > (defense - attack);
+					console.log({ attack: attack, defense: defense, roll: roll});
+					return (attack + roll) - defense;
 				}
 			}
 			var createRogueDeck = function (){
@@ -201,11 +207,11 @@
 						hitPoints: ko.observable(window.utils.getRandomNumber(15)),
 						fightLog: ko.observable(''),
 						processAttack: function (attacker, defender) {
-							var attackerRoll = window.utils.getRandomNumber(6);
+							var attackerRoll = window.utils.getRandomNumber(10);
 							this.fightLog('<br />' + attacker.name() + ' rolls ' + attackerRoll + this.fightLog());
-							if (window.utils.calculateHit(attacker.attack, defender.defense, attackerRoll)) {
+							var dmg = window.utils.calculateHit(attacker.attack, defender.defense, attackerRoll);
+							if (dmg > 0) {
 								//process hit
-								var dmg = (attacker.attack) + window.utils.getRandomNumber(6);
 								defender.hitPoints(defender.hitPoints() - dmg);
 								this.fightLog('<br />' + defender.name() + ' takes ' + dmg + ' damage.' + this.fightLog());
 							} else {
@@ -313,7 +319,7 @@
 				
 				self.useLootCard = function(lootCard) {
 					if (self.lootCards.indexOf(lootCard) < 0) {
-						alert('You can\'t use that loot card!');
+						window.rogueGame.addMessageToLog('You can\'t use that loot card!');
 						return;
 					}
 					
@@ -327,10 +333,10 @@
 						case "medium health potion":
 						case "large health potion":
 							self.hitPoints(self.hitPoints() + lootCard.value);
-							alert('You gained ' + lootCard.value + ' hit points.');
+							window.rogueGame.addMessageToLog('You gained ' + lootCard.value + ' hit points.');
 							break;
 						default:
-							alert('Nothing happened');
+							window.rogueGame.addMessageToLog('Nothing happened');
 					}
 				}
 			}
@@ -338,10 +344,24 @@
 				var self = this;
 				self.currentAreaCard = ko.observable(null);
 				self.player = ko.observable(null);
+				self.messageLog = ko.observableArray();				
 				
 				var rogueDeck = new createRogueDeck();
 				
+				self.addMessageToLog = function (msg, level) {
+					level = level || 'info';
+					if (self.messageLog().length == 4) {
+						self.messageLog.pop();
+					}
+					
+					self.messageLog.push({ message: msg, level: level });
+				}
+				
+				self.clearMessageLog = function() {
+					self.messageLog.removeAll();
+				}
 				self.startGameAndGetFirstRoom = function () {
+					self.addMessageToLog("New game begun.");
 					self.player(new createRoguePlayer("Steve"));
 					self.currentAreaCard(rogueDeck.getAreaCard(true));
 				};
@@ -370,22 +390,24 @@
 				
 				self.tryMoveToNewArea = function(door) {
 					if (!self.moveToNextArea(door.direction)) {
-						alert('You can\'t move that direction!');
+						window.rogueGame.addMessageToLog('You can\'t move that direction!');
 					}
 				};
 				
 				self.takeItem = function(lootCard) {
 					self.player().lootCards.push(lootCard);
 					self.currentAreaCard().loot.remove(lootCard);
+					processTurnCompletion();
 				};
 				
 				self.useItem = function(lootCard) {
 					self.player().useLootCard(lootCard);
+					processTurnCompletion();
 				};
 				
 				var processEndGame = function() {
 					if (self.player().hitPoints() < 1) {
-						alert('You have died.');
+						window.rogueGame.addMessageToLog('You have died.');
 						window.rogueGame.startGameAndGetFirstRoom();
 					}
 				};
@@ -393,7 +415,7 @@
 				self.processPlayerAttack = function(monster) {
 					monster.processAttack(self.player(), monster);
 					if (monster.hitPoints() < 1) {
-						alert('You killed the ' + monster.type);
+						window.rogueGame.addMessageToLog('You killed the ' + monster.type);
 						self.currentAreaCard().monsters.remove(monster);
 						self.currentAreaCard().addMonsterDrop(monster);
 					}
