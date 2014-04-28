@@ -44,7 +44,12 @@
 	<script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 	<script src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-3.0.0.js"></script>
 	<script type="text/javascript" id="GameCode">
-		(function(window) {			
+		(function(window) {		
+			window.utils = {
+				getRandomNumber: function (max) {
+					return Math.floor((Math.random()*max)+1);
+				}
+			}
 			var createRogueDeck = function (){
 				var self = this;
 				self.utils = {
@@ -64,7 +69,7 @@
 							return doors;
 						},
 						getRandomDirection: function () {
-							var rnd = self.utils.getRandomNumber(4);
+							var rnd = window.utils.getRandomNumber(4);
 							switch (rnd) {
 								case 1:
 									return 'North';
@@ -77,11 +82,8 @@
 							}
 						},
 						getRandomDoors: function() {
-							return self.utils.doorUtils.getDoors(self.getRandomNumber(4));
+							return self.utils.doorUtils.getDoors(window.utils.getRandomNumber(4));
 						}
-					},
-					getRandomNumber: function (max) {
-						return Math.floor((Math.random()*max)+1);
 					}
 				};
 			
@@ -91,12 +93,12 @@
 						loot: [],
 						doors: [],
 						type: 'room',
-						sizeInt: self.utils.getRandomNumber(10)
+						sizeInt: window.utils.getRandomNumber(10)
 					};
 					
 					card.doors = self.utils.doorUtils.getDoors(Math.floor(card.sizeInt / 2));
 					if (!isFirstCard) {					
-						if (self.utils.getRandomNumber(10) < 7) {
+						if (window.utils.getRandomNumber(10) < 7) {
 							card.type = 'hallway';
 						}
 						
@@ -143,7 +145,11 @@
 					return new areaCard(isFirstCard);
 				}
 			};
-			
+			var createRoguePlayer = function (name) {
+				var self = this;
+				self.name = name;
+				
+			}
 			window.rogueGame = new function () {
 				var self = this;
 				self.currentAreaCard = ko.observable(null);
