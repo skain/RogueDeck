@@ -9,7 +9,6 @@
 	<style>
 		.disabled
 		{
-			border: solid 1px Red;
 		}
 		.disabled:after
 		{
@@ -17,7 +16,7 @@
 			position: absolute;
 			height: 100%;
 			width: 100%;
-			background-color: red;
+			background-color: Black;
 			opacity: .2;
 			content: ' ';
 			top: 0px;
@@ -97,17 +96,20 @@
 						<td data-bind="text: vitality"></td>
 					</tr>
 				</table>
+				<div data-bind="visible: rogueGame.curTurnIndex() < 2">
+					<input type="button" value="Re-roll" data-bind="click: rogueGame.rerollCharacter" />
+				</div>
 			</div>
 			<div class="col-sm-3">
 				<h3>Vitals</h3>
 				<table>
 					<tr>
 						<th>Hit Points</th>
-						<td data-bind="text:hitPoints"></td>
+						<td><span data-bind="text:hitPoints"></span>(/<span data-bind="text:maxHitPoints"></span>)</td>
 					</tr>
 					<tr>
 						<th>Stomach</th>
-						<td data-bind="text:stomach"></td>
+						<td><span data-bind="text:stomach"></span>(/<span data-bind="text:maxStomach"></span>)</td>
 					</tr>
 				</table>
 			</div>
@@ -138,8 +140,10 @@
 				getRandomNumber: function (max) {
 					return Math.floor((Math.random()*max)+1);
 				},
+				getRandomNumberBetween: function (min, max) {
+					return Math.floor(Math.random()*(max-min+1)+min);
+				},
 				calculateHit: function(attack, defense, roll) {
-					console.log({ attack: attack, defense: defense, roll: roll});
 					return (attack + roll) - defense;
 				}
 			}
@@ -183,7 +187,7 @@
 					if (rnd < 3) {
 						card.type = 'food';
 						card.verb = 'eat';
-						card.value = 50;
+						card.value = 10;
 					} else if (rnd < 5) {
 						card.type = 'health potion';
 						card.verb = 'use';
@@ -210,9 +214,9 @@
 					var card = {
 						type: 'Monster',
 						name: ko.observable('Monster!'),
-						attack: window.utils.getRandomNumber(15),
-						defense: window.utils.getRandomNumber(15),
-						hitPoints: ko.observable(window.utils.getRandomNumber(15)),
+						attack: window.utils.getRandomNumberBetween(5,15),
+						defense: window.utils.getRandomNumberBetween(5,15),
+						hitPoints: ko.observable(window.utils.getRandomNumberBetween(3,15)),
 						fightLog: ko.observable(''),
 						processAttack: function (attacker, defender) {
 							var attackerRoll = window.utils.getRandomNumber(10);
@@ -318,12 +322,14 @@
 				var self = this;
 				self.name = ko.observable(name);
 				self.type = 'Player';
-				self.stomach = ko.observable(100);
-				self.strength = ko.observable(window.utils.getRandomNumber(15));
-				self.vitality = ko.observable(window.utils.getRandomNumber(15));
-				self.intelligence = ko.observable(window.utils.getRandomNumber(15));
-				self.dexterity = ko.observable(window.utils.getRandomNumber(15));
-				self.hitPoints = ko.observable(15 + self.vitality());
+				self.maxStomach = ko.observable(30);
+				self.stomach = ko.observable(self.maxStomach());
+				self.strength = ko.observable(window.utils.getRandomNumberBetween(5,15));
+				self.vitality = ko.observable(window.utils.getRandomNumberBetween(5,15));
+				self.intelligence = ko.observable(window.utils.getRandomNumberBetween(5,15));
+				self.dexterity = ko.observable(window.utils.getRandomNumberBetween(5,15));
+				self.maxHitPoints = ko.computed(function () { return 15 + self.vitality()});
+				self.hitPoints = ko.observable(self.maxHitPoints());
 				self.lootCards = ko.observableArray();
 				self.attack = self.strength();
 				self.defense = self.dexterity();
@@ -339,13 +345,26 @@
 					
 					switch(lootCard.type) {
 						case "food":
-							self.stomach(self.stomach() + lootCard.value);
+							var gained = lootCard.value;
+							if ((self.stomach() + gained) > self.maxStomach()) {
+								gained = self.maxStomach() - self.stomach();
+								self.stomach(self.maxStomach());
+							} else {
+								self.stomach(self.stomach() + lootCard.value);
+							}
+							window.rogueGame.addMessageToLog('You gained ' + gained + '/' + lootCard.value + ' stomach. Mmm, that was good.');
 							break;
 						case "small health potion":
 						case "medium health potion":
 						case "large health potion":
-							self.hitPoints(self.hitPoints() + lootCard.value);
-							window.rogueGame.addMessageToLog('You gained ' + lootCard.value + ' hit points.');
+							var gained = lootCard.value;
+							if ((self.hitPoints() + gained) > self.maxHitPoints()) {
+								gained = self.maxHitPoints() - self.hitPoints();
+								self.hitPoints(self.maxHitPoints());
+							} else {
+								self.hitPoints(self.hitPoints() + lootCard.value);
+							}
+							window.rogueGame.addMessageToLog('You gained ' + gained + '/' + lootCard.value + ' hit points.');
 							break;
 						default:
 							window.rogueGame.addMessageToLog('Nothing happened');
@@ -357,15 +376,15 @@
 				self.currentAreaCard = ko.observable(null);
 				self.player = ko.observable(null);
 				self.messageLog = ko.observableArray();		
-				var curMessageLogIndex = 0;
+				self.curTurnIndex = ko.observable(0);
 				
 				var rogueDeck = new createRogueDeck();
 				
 				self.addMessageToLog = function (msg, level) {
 					level = level || 'info';
 							
-					curMessageLogIndex++;
-					self.messageLog.unshift({ message: msg, level: level, index: curMessageLogIndex });
+					self.curTurnIndex(self.curTurnIndex() + 1);
+					self.messageLog.unshift({ message: msg, level: level, index: self.curTurnIndex() });
 					if (self.messageLog().length == 7) {
 						self.messageLog.pop();
 					}
@@ -373,7 +392,13 @@
 				
 				self.clearMessageLog = function() {
 					self.messageLog.removeAll();
-				}
+				};
+				
+				self.rerollCharacter = function () {
+					self.addMessageToLog("Re-rolling character.", 'info');
+					self.curTurnIndex(0);
+					self.startGameAndGetFirstRoom();
+				};
 				self.startGameAndGetFirstRoom = function () {
 					self.addMessageToLog("New game begun.");
 					self.player(new createRoguePlayer("Steve"));
@@ -426,8 +451,18 @@
 				};
 				
 				var processEndGame = function() {
+					var gameOver = false;
 					if (self.player().hitPoints() < 1) {
-						window.rogueGame.addMessageToLog('You have died.', 'danger');
+						window.rogueGame.addMessageToLog('You have died from your injuries.', 'danger');
+						gameOver = true;
+					}
+					
+					if (self.player().stomach() < 1) {
+						window.rogueGame.addMessageToLog('You have died of hunger.', 'danger');
+						gameOver = true;
+					}
+					if (gameOver) {
+						self.curTurnIndex(0);
 						window.rogueGame.startGameAndGetFirstRoom();
 					}
 				};
