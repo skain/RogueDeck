@@ -439,6 +439,10 @@
                 var processTurnCompletion = function() {
                     processMonsterTurns();
                     self.player().stomach(self.player().stomach() - 1);
+                    if (self.player().stomach() < 1) {
+                    	self.addMessageToLog('You are hungry! (-1 HP)');
+                    	self.player().hitPoints(self.player().hitPoints() - 1);
+                    }
                 }
 
                 self.moveToNextArea = function(direction) {
@@ -479,12 +483,6 @@
                     var msg, logLevel;
                     if (self.player().hitPoints() < 1) {
                         msg = 'You have died from your injuries.';
-                        logLevel = 'danger';
-                        gameOver = true;
-                    }
-
-                    if (self.player().stomach() < 1) {
-                        msg = 'You have died of hunger.';
                         logLevel = 'danger';
                         gameOver = true;
                     }
