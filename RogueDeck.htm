@@ -46,6 +46,7 @@
             display: none;
             border: solid 2px red;
         }
+
         #AlertMsg {
             text-align: center;
             line-height: 160px;
@@ -144,9 +145,15 @@
                     <li><span data-bind="text: type"> </span> [<a href="javascript:void(0);" data-bind="text: verb, click:window.rogueGame.useItem"></a>]
                 </ul>
             </div>
+            <div class="col-sm-3">
+                <h3>Equipped</h3>
+                <ul>
+                    <li data-bind="text: weapon().displayName"></li>
+                </ul>
+            </div>
         </div>
         <div class="row" id="MessageLogDiv" data-bind="foreach: messageLog">
-            <div data-bind="attr { class: 'alert alert-' + $data.level }">
+            <div data-bind="attr: { class: 'alert alert-' + $data.level }">
                 <div class="col-sm-1"><span class="badge" data-bind="text:$data.index"></span></div><div class="col-sm-11"><span data-bind="text:$data.message"></span></div><div style="clear: both"></div>
             </div>
         </div>
@@ -168,6 +175,7 @@
                     return Math.floor(Math.random()*(max-min+1)+min);
                 },
                 calculateHit: function(attack, defense, roll) {
+                    console.log({ attack: attack, defense: defense, roll: roll, damage: (attack + roll) - defense });
                     return (attack + roll) - defense;
                 }
             }
@@ -238,14 +246,14 @@
                     var card = {
                         type: 'Monster',
                         name: ko.observable('Monster!'),
-                        attack: window.utils.getRandomNumberBetween(5,15),
-                        defense: window.utils.getRandomNumberBetween(5,15),
+                        attack: ko.observable(window.utils.getRandomNumberBetween(5,15)),
+                        defense: ko.observable(window.utils.getRandomNumberBetween(5,15)),
                         hitPoints: ko.observable(window.utils.getRandomNumberBetween(3,15)),
                         fightLog: ko.observable(''),
                         processAttack: function (attacker, defender) {
                             var attackerRoll = window.utils.getRandomNumber(10);
                             this.fightLog('<br />' + attacker.name() + ' rolls ' + attackerRoll + this.fightLog());
-                            var dmg = window.utils.calculateHit(attacker.attack, defender.defense, attackerRoll);
+                            var dmg = window.utils.calculateHit(attacker.attack(), defender.defense(), attackerRoll);
 
                             if (dmg > 0) {
                                 //process hit
@@ -342,21 +350,67 @@
                     return new areaCard(isFirstCard);
                 }
             };
+
+            var weapon = function (name, baseDamage, buffs) {
+                var getBuffsFromArg = function (buffs) {
+                    return buffs ? (buffs instanceof Array ? buffs : [ buffs ]) : [];
+                }
+                var self = this;
+                self.baseDamage = baseDamage;
+                self.buffs = ko.observableArray(getBuffsFromArg(buffs));
+                self.name = ko.observable(name);
+                self.displayName = ko.computed(function () {
+                    var buffs = '';
+                    for (var i = 0; i < self.buffs().length; i++) {
+                        var buff = self.buffs()[i];
+                        if (buff.damage) {
+                            buffs = '';
+                            if (buff.damage > 0) {
+                                buffs = buffs + ' +' + buff.damage;
+                            } else if (buff.damage < 0) {
+                                buffs = buffs + ' ' + buff.damage;
+                            }
+                        }
+                    }
+
+                    return self.name() + buffs;
+                });
+                self.totalToHit = ko.computed(function () {
+                    var dmg = self.baseDamage;
+                    for (var i = 0; i < self.buffs().length; i++) {
+                        var buff = self.buffs()[i];
+                        if (buff.damage) {
+                            dmg += buff.damage;
+                        }
+                    }
+                    return dmg;
+                });
+            };
+
+            var createShortSword = function(buffs) {
+                return new weapon('Short Sword', 3, buffs);
+            };
+
             var createRoguePlayer = function (name) {
                 var self = this;
                 self.name = ko.observable(name);
                 self.type = 'Player';
-                self.maxStomach = ko.observable(30);
-                self.stomach = ko.observable(self.maxStomach());
                 self.strength = ko.observable(window.utils.getRandomNumberBetween(5,15));
                 self.vitality = ko.observable(window.utils.getRandomNumberBetween(5,15));
                 self.intelligence = ko.observable(window.utils.getRandomNumberBetween(5,15));
                 self.dexterity = ko.observable(window.utils.getRandomNumberBetween(5,15));
                 self.maxHitPoints = ko.computed(function () { return 15 + self.vitality()});
                 self.hitPoints = ko.observable(self.maxHitPoints());
+                self.maxStomach = ko.observable(20 + self.vitality());
+                self.stomach = ko.observable(self.maxStomach());
                 self.lootCards = ko.observableArray();
-                self.attack = self.strength();
-                self.defense = self.dexterity();
+                self.defense = ko.computed(function() { 
+                    return self.dexterity();
+                });
+                self.weapon = ko.observable(createShortSword({ damage: 1 }));
+                self.attack = ko.computed(function() {
+                   return self.strength() + self.weapon().totalToHit();
+                });
                 self.isPlayer = true;
 
                 self.useLootCard = function(lootCard) {
@@ -440,8 +494,8 @@
                     processMonsterTurns();
                     self.player().stomach(self.player().stomach() - 1);
                     if (self.player().stomach() < 1) {
-                    	self.addMessageToLog('You are hungry! (-1 HP)');
-                    	self.player().hitPoints(self.player().hitPoints() - 1);
+                        self.addMessageToLog('You are hungry! (-1 HP)');
+                        self.player().hitPoints(self.player().hitPoints() - 1);
                     }
                 }
 
