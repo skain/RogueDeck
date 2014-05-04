@@ -210,175 +210,185 @@
 			//object defs
 			var rogueDeckManager = function () {
 				var self = this;
-				self.utils = {
-					doorUtils: {
-						getDoors: function (numDoors) {
-							var doors = [];
-							if (numDoors < 1) {
-								numDoors = 1;
-							}
-							for (var i = 0; i < numDoors; i++) {
-								var dir = self.utils.doorUtils.getRandomDirection();
-								doors.push({
-									direction: dir
-								});
-							}
 
-							return doors;
-						},
-						getRandomDirection: function () {
-							var rnd = window.utils.getRandomNumber(4);
-							switch (rnd) {
-								case 1:
-									return 'North';
-								case 2:
-									return 'East';
-								case 3:
-									return 'South';
-								case 4:
-									return 'West';
-							}
-						}
-					}
-				};
-
-				function getLootCard() {
-					var card = {};
+				self.createRandomLootCard = function() {
 					var rnd = window.utils.getRandomNumber(10);
+					var type, verb, value;
 					if (rnd < 3) {
-						card.type = 'food';
-						card.verb = 'eat';
-						card.value = 10;
+						type = 'food';
+						verb = 'eat';
+						value = 10;
 					} else if (rnd < 5) {
-						card.type = 'health potion';
-						card.verb = 'use';
+						type = 'health potion';
+						verb = 'use';
 						var size = window.utils.getRandomNumber(10);
 						if (size < 5) {
-							card.type = 'small ' + card.type;
-							card.value = 10;
+							type = 'small ' + type;
+							value = 10;
 						} else if (size < 8) {
-							card.type = 'medium ' + card.type;
-							card.value = 20;
+							type = 'medium ' + type;
+							value = 20;
 						} else {
-							card.type = 'large ' + card.type;
-							card.value = 30;
+							type = 'large ' + type;
+							value = 30;
 						}
 					} else {
-						card.type = 'other thing';
-						card.verb = 'use';
+						type = 'other thing';
+						verb = 'use';
 					}
-					card.droppedBy = 'There is a ';
-					return card;
+
+					return new lootCard(self, type, verb, value);
 				}
 
-				function getMonsterCard() {
-					var card = {
-						type: 'Monster',
-						name: ko.observable('Monster!'),
-						attack: ko.observable(window.utils.getRandomNumberBetween(5, 15)),
-						defense: ko.observable(window.utils.getRandomNumberBetween(5, 15)),
-						hitPoints: ko.observable(window.utils.getRandomNumberBetween(3, 15)),
-						fightLog: ko.observable(''),
-						processAttack: function (attacker, defender) {
-							var attackerRoll = window.utils.getRandomNumber(10);
-							this.fightLog('<br />' + attacker.name() + ' rolls ' + attackerRoll + this.fightLog());
-							var dmg = window.utils.calculateHit(attacker.attack(), defender.defense(), attackerRoll);
+				self.createRandomMonsterCard = function () {
+					var attack = window.utils.getRandomNumberBetween(5, 15);
+					var defense = window.utils.getRandomNumberBetween(5, 15);
+					var hitPoints = window.utils.getRandomNumberBetween(3, 15);
 
-							if (dmg > 0) {
-								//process hit
-								defender.hitPoints(defender.hitPoints() - dmg);
-								this.fightLog('<br />' + defender.name() + ' takes ' + dmg + ' damage.' + this.fightLog());
-								window.rogueGame.addMessageToLog(attacker.name() + ' hits ' + defender.name() + ' for ' + dmg + ' HP of damage.', attacker.isPlayer ? 'success' : 'danger');
-							} else {
-								//process miss
-								this.fightLog('<br />' + attacker.name() + ' misses.' + this.fightLog());
-								window.rogueGame.addMessageToLog(attacker.name() + ' misses ' + defender.name(), attacker.isPlayer ? 'warning' : 'success');
-							}
-						}
-					};
-
-					return card;
+					return new monsterCard(self, 'Monster', 'Monster!', attack, defense, hitPoints);
 				}
 
-				function areaCard(isFirstCard) {
-					var card = {
-						monsters: ko.observableArray(),
-						loot: ko.observableArray(),
-						doors: [],
-						type: 'room',
-						sizeInt: window.utils.getRandomNumber(10)
-					};
-
-					card.doors = self.utils.doorUtils.getDoors(Math.floor(card.sizeInt / 2));
-
+				self.createRandomAreaCard = function(isFirstCard) {
+					var cardSizeInt = window.utils.getRandomNumber(10);
+					//var cardDoors = self.utils.doorUtils.getDoors(Math.floor(cardSizeInt / 2));
+					var cardType = 'room';
 					if (!isFirstCard) {
 						if (window.utils.getRandomNumber(10) < 7) {
-							card.type = 'hallway';
+							cardType = 'hallway';
 						}
 
 						//calculate random loot
-						if (card.type == 'room') {
-							var numLoot = Math.floor(card.sizeInt / 2);
+						var cardLoot = [];
+						if (cardType == 'room') {
+							var numLoot = Math.floor(cardSizeInt / 2);
 							for (var i = 0; i < numLoot; i++) {
-								var lc = getLootCard();
+								var lc = self.createRandomLootCard();
 								if (lc) {
-									card.loot.push(lc);
+									cardLoot.push(lc);
 								}
 							}
 						}
 
+						var cardMonsters = [];
 						//calculate random monsters
-						var numMonsters = Math.floor(card.sizeInt / 3); //allow for no monsters
+						var numMonsters = Math.floor(cardSizeInt / 3); //allow for no monsters
 						for (var i = 0; i < numMonsters; i++) {
-							var mc = getMonsterCard();
+							var mc = self.createRandomMonsterCard();
 							if (mc) {
-								card.monsters.push(mc);
+								cardMonsters.push(mc);
 							}
 						}
 					}
 
-					if (card.sizeInt < 4) {
-						card.sizeText = 'small';
-					} else if (card.sizeInt < 9) {
-						card.sizeText = 'medium';
-					} else {
-						card.sizeText = 'large';
-					}
-
-					if (card.type == 'hallway') {
-						switch (card.sizeText) {
-							case 'small':
-								card.sizeText = 'short';
-								break;
-							case 'large':
-								card.sizeText = 'long';
-								break;
-						}
-					}
-
-					card.directionExists = function (direction) {
-						direction = direction.substr(0, 1).toLowerCase();
-						for (var i = 0; i < card.doors.length; i++) {
-							if (card.doors[i].direction.substr(0, 1).toLowerCase() == direction) {
-								return true;
-							}
-						}
-
-						return false;
-					}
-
-					card.addMonsterDrop = function (monster) {
-						var lc = getLootCard();
-						lc.droppedBy = monster.name() + ' dropped a ';
-						card.loot.push(lc);
-					}
-					return card;
+					return new areaCard(self, cardMonsters, cardLoot, cardType, cardSizeInt);
 				};
-
-				self.getAreaCard = function (isFirstCard) {
-					return new areaCard(isFirstCard);
-				}
 			};
+
+			var doorCard = function (direction) {
+				var self = this;
+				self.getRandomDirection = function () {
+					var rnd = window.utils.getRandomNumber(4);
+					switch (rnd) {
+						case 1:
+							return 'North';
+						case 2:
+							return 'East';
+						case 3:
+							return 'South';
+						case 4:
+							return 'West';
+					}
+				};
+				self.direction = direction || self.getRandomDirection();
+			}
+			var lootCard = function (deck, type, verb, value) {
+				var self = this;
+				self.deck = deck;
+				self.type = type;
+				self.verb = verb;
+				self.value = value;
+				self.droppedBy = 'There is a ';
+			}
+
+			var monsterCard = function (deck, type, name, attack, defense, hitPoints) {
+				var self = this;
+				self.deck = deck;
+				self.type = type || "Monster";
+				self.name = ko.observable(name);
+				self.attack = ko.observable(attack || 1);
+				self.defense = ko.observable(defense || 1);
+				self.hitPoints = ko.observable(hitPoints || 1);
+				self.fightLog = ko.observable('');
+				self.processAttack = function (attacker, defender) {
+					var attackerRoll = window.utils.getRandomNumber(10);
+					this.fightLog('<br />' + attacker.name() + ' rolls ' + attackerRoll + this.fightLog());
+					var dmg = window.utils.calculateHit(attacker.attack(), defender.defense(), attackerRoll);
+
+					if (dmg > 0) {
+						//process hit
+						defender.hitPoints(defender.hitPoints() - dmg);
+						this.fightLog('<br />' + defender.name() + ' takes ' + dmg + ' damage.' + this.fightLog());
+						window.rogueGame.addMessageToLog(attacker.name() + ' hits ' + defender.name() + ' for ' + dmg + ' HP of damage.', attacker.isPlayer ? 'success' : 'danger');
+					} else {
+						//process miss
+						this.fightLog('<br />' + attacker.name() + ' misses.' + this.fightLog());
+						window.rogueGame.addMessageToLog(attacker.name() + ' misses ' + defender.name(), attacker.isPlayer ? 'warning' : 'success');
+					}
+				}
+			}
+
+			var areaCard = function (deck, monsters, loot, type, sizeInt) {
+				var self = this;
+				self.deck = deck;
+				self.monsters = ko.observableArray(monsters || []);
+				self.loot = ko.observableArray(loot || []);
+				self.doors = ko.observableArray([]);
+				self.type = type || 'room';
+				self.sizeInt = sizeInt || 1;
+
+				if (self.sizeInt < 4) {
+					self.sizeText = 'small';
+				} else if (self.sizeInt < 9) {
+					self.sizeText = 'medium';
+				} else {
+					self.sizeText = 'large';
+				}
+
+				if (self.type == 'hallway') {
+					switch (self.sizeText) {
+						case 'small':
+							self.sizeText = 'short';
+							break;
+						case 'large':
+							self.sizeText = 'long';
+							break;
+					}
+				}
+
+				self.directionExists = function (direction) {
+					direction = direction.substr(0, 1).toLowerCase();
+					for (var i = 0; i < self.doors().length; i++) {
+						if (self.doors()[i].direction.substr(0, 1).toLowerCase() == direction) {
+							return true;
+						}
+					}
+
+					return false;
+				}
+
+				self.addMonsterDrop = function (monster) {
+					var lc = deck.createRandomLootCard();
+					lc.droppedBy = monster.name() + ' dropped a ';
+					self.loot.push(lc);
+				}
+			
+				var numDoors = Math.max(1, Math.floor(self.sizeInt / 2));
+				for (var i = 0; i < numDoors; i++) {
+					self.doors.push(new doorCard());
+				}
+
+			};
+
 			var weapon = function (name, baseDamage, buffs) {
 				var self = this;
 				self.baseDamage = baseDamage;
@@ -510,7 +520,7 @@
 				self.startGameAndGetFirstRoom = function () {
 					self.addMessageToLog("New game begun.");
 					self.player(new roguePlayer("Steve"));
-					self.currentAreaCard(rogueDeck.getAreaCard(true));
+					self.currentAreaCard(rogueDeck.createRandomAreaCard(true));
 				};
 
 				var processMonsterTurns = function () {
@@ -532,7 +542,7 @@
 				self.moveToNextArea = function (direction) {
 					if (self.currentAreaCard().directionExists(direction)) {
 						processTurnCompletion();
-						self.currentAreaCard(rogueDeck.getAreaCard(false));
+						self.currentAreaCard(rogueDeck.createRandomAreaCard(false));
 						self.addMessageToLog('You moved ' + direction);
 						if (self.currentAreaCard().monsters().length > 0) {
 							self.addMessageToLog('There are monsters here!', 'danger');
