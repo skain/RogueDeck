@@ -454,21 +454,20 @@
 			if (!max) {
 				throw 'max must be supplied';
 			}
+			var numNumbers = (max - min) + 1;
+			var roll = Math.floor((Math.random() * 100) + 1);
 
-			var roll = window.utils.getRandomNumber(10); //the chance of getting something good
-			var buff = min;
+			var pct = (2 / numNumbers); //percents get smaller as number of possible numbers goes up
 
-			var midpoint = Math.floor((min + max) / 2);
-
-			if (roll == 10) {
-				buff = max;
-			} else if (roll > 7) {
-				buff = window.utils.getRandomNumberBetween(midpoint, max - 1);
-			} else if (roll > 4) {
-				buff = window.utils.getRandomNumberBetween(min, midpoint);
+			var remaining = 100;
+			for (var i = 0; i < numNumbers; i++) {
+				remaining = remaining - (remaining * pct);
+				if (roll >= remaining) {
+					return i + min;
+				}
 			}
 
-			return buff;
+			return min;
 		};
 
 		self.getRandomDamageBuff = function (min, max) {
