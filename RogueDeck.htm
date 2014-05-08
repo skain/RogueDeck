@@ -101,7 +101,7 @@
 			<div class="col-sm-4" id="LootDiv">
 				<h3>Loot</h3>
 				<ul data-bind="foreach: loot">
-					<li><span data-bind="text: droppedBy"></span> <span data-bind="text:type"></span> here. <a href="javascript:void(0);" data-bind="click:window.rogueGame.takeItem">Take</a></li>
+					<li><span data-bind="text: droppedBy"></span> <span data-bind="text:type"></span> <span class="badgesSpan" data-bind="if: value && value.buffs"><span data-bind="template: { name: 'BuffsBadgesTemplate', foreach: value.buffs }"></span></span> here. <a href="javascript:void(0);" data-bind="click:window.rogueGame.takeItem">Take</a></li>
 				</ul>
 			</div>
 		</div>
@@ -147,14 +147,17 @@
 			<div class="col-sm-3">
 				<h3>Inventory</h3>
 				<ul data-bind="foreach: lootCards">
-					<li><span data-bind="text: type"> </span> [<a href="javascript:void(0);" data-bind="text: verb, click:window.rogueGame.useItem"></a>]
+					<li>
+						<span data-bind="text: type"></span> <span class="badgesSpan" data-bind="if: value.buffs"><span data-bind="template: { name: 'BuffsBadgesTemplate', foreach: value.buffs }"></span></span>
+						[<a href="javascript:void(0);" data-bind="text: verb, click:window.rogueGame.useItem"></a>]
+					</li>
 				</ul>
 			</div>
 			<div class="col-sm-3">
 				<h3>Equipped</h3>
 				<ul>
-					<li><strong>Right-Hand:</strong> <span data-bind="text: weapon().displayName"></span> (Dmg: <span data-bind="text: weapon().totalToHit"></span>)</li>
-					<li><strong>Armor:</strong> <span data-bind="text: armor().displayName"> </span> (Def: <span data-bind="text: armor().totalDefense" ></span>)</li>
+					<li><strong>Right-Hand:</strong> <span data-bind="text: weapon().displayName"></span><span class="badgesSpan" data-bind="template: { name: 'BuffsBadgesTemplate', foreach: weapon().buffs }"></span> (Dmg: <span data-bind="text: weapon().totalToHit"></span>)</li>
+					<li><strong>Armor:</strong> <span data-bind="text: armor().displayName"> </span><span class="badgesSpan" data-bind="template: { name: 'BuffsBadgesTemplate', foreach: armor().buffs }"></span> (Def: <span data-bind="text: armor().totalDefense"></span>)</li>
 				</ul>
 			</div>
 		</div>
@@ -179,6 +182,10 @@
 			rogueGame.startGameAndGetFirstRoom();
 			ko.applyBindings(window.rogueGame);
 		});
+	</script>
+	<!-- Named Templates -->
+	<script type="text/html" id="BuffsBadgesTemplate">
+		<span data-bind="text: displayName" class="badge"></span>
 	</script>
 </body>
 </html>

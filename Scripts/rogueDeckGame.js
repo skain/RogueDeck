@@ -4,32 +4,9 @@
 		var self = this;
 
 		self.createRandomLootCard = function () {
-			//var rnd = window.utils.getRandomNumber(10);
 			var type, verb, value;
-			//if (rnd < 3) {
-			//	type = 'food';
-			//	verb = 'eat';
-			//	value = 10;
-			//} else if (rnd < 5) {
-			//	type = 'health potion';
-			//	verb = 'use';
-			//	var size = window.utils.getRandomNumber(10);
-			//	if (size < 5) {
-			//		type = 'small ' + type;
-			//		value = 10;
-			//	} else if (size < 8) {
-			//		type = 'medium ' + type;
-			//		value = 20;
-			//	} else {
-			//		type = 'large ' + type;
-			//		value = 30;
-			//	}
-			//} else {
-			//	type = 'other thing';
-			//	verb = 'use';
-			//}
 
-			var rnd = window.utils.getWeightedRandomNumber(1, 3);
+			var rnd = window.utils.getWeightedRandomNumber(1, 10);
 			switch (rnd) {
 				case 1:
 					//other thing
@@ -63,6 +40,12 @@
 					}
 					break;
 				case 4:
+				case 5:
+				case 6:
+				case 7:
+				case 8:
+				case 9:
+				case 10:
 					//weapon or armor
 					var rnd = window.utils.getRandomNumberBetween(1, 2);
 					var tier = window.utils.getWeightedRandomNumber(1, 5);
@@ -86,8 +69,32 @@
 								weapon = weaponFactory.getRandomTier5Weapon();
 								break;
 						}
+						type = weapon.displayName();
+						value = weapon;
+						verb = 'equip';
 					} else {
 						//armor
+						var armor = null;
+						switch (tier) {
+							case 1:
+								armor = armorFactory.getRandomTier1Armor();
+								break;
+							case 2:
+								armor = armorFactory.getRandomTier2Armor();
+								break;
+							case 3:
+								armor = armorFactory.getRandomTier3Armor();
+								break;
+							case 4:
+								armor = armorFactory.getRandomTier4Armor();
+								break;
+							case 5:
+								armor = armorFactory.getRandomTier5Armor();
+								break;
+						}
+						type = armor.displayName();
+						value = armor;
+						verb = 'equip';
 					}
 					break;
 			}
@@ -250,7 +257,7 @@
 		self.buffs = ko.observableArray(window.utils.getBuffsFromArg(buffs));
 		self.name = ko.observable(name);
 		self.displayName = ko.computed(function () {
-			return window.utils.getItemName(self);
+			return self.name();
 		});
 		self.totalToHit = ko.computed(function () {
 			var dmg = self.baseDamage;
@@ -270,7 +277,7 @@
 		self.buffs = ko.observableArray(window.utils.getBuffsFromArg(buffs));
 		self.name = ko.observable(name);
 		self.displayName = ko.computed(function () {
-			return window.utils.getItemName(self);
+			return self.name();
 		});
 		self.totalDefense = ko.computed(function () {
 			var def = self.baseDefense;
@@ -339,15 +346,60 @@
 					window.rogueGame.addMessageToLog('You gained ' + gained + '/' + lootCard.value + ' hit points.');
 					break;
 				default:
-					window.rogueGame.addMessageToLog('Nothing happened');
+					if (verb == 'equip') {
+						self.equipItem(lootCard.value);
+					} else {
+						window.rogueGame.addMessageToLog('Nothing happened');
+					}
+					break;
 			}
-		}
+		};
+
+		self.equipItem = function (item) {
+			switch (item.type) {
+				case 'weapon':
+					self.equipWeapon(item);
+					break;
+				case 'armor':
+					self.equipArmor(item);
+					break;
+			}
+		};
+
+		self.equipWeapon = function (item) {
+			throw 'not implemented yet'
+		};
+
+		self.equipArmor = function (item) {
+
+			throw 'not implemented yet'
+		};
 	}
 
 	var buff = function (damage, defense) {
 		var self = this;
 		self.damage = damage;
 		self.defense = defense;
+		self.displayName = ko.computed(function () {
+			var buffs = '';
+			if (self.damage) {
+				if (self.damage > 0) {
+					buffs = buffs + ' Dmg+' + self.damage;
+				} else if (self.damage < 0) {
+					buffs = buffs + ' Dmg' + self.damage;
+				}
+			}
+
+			if (self.defense) {
+				if (self.defense > 0) {
+					buffs = buffs + ' Def+' + self.defense;
+				} else if (self.defense < 0) {
+					buffs = buffs + ' Def' + self.defense;
+				}
+			}
+
+			return buffs;
+		})
 	};
 
 	var rogueGame = function () {
@@ -479,23 +531,49 @@
 	var weaponFactory = new function () {
 		var self = this;
 
-		self.getRandomTier1Weapon = function () {
-			var item = rogueDeckDictionary.weaponTypes.getTier1WeaponType();
+		var getWeaponFromItem = function (item) {
 			var w = new weapon(item.name, item.modifier, []);
 			var buffsRoll = window.utils.getRandomNumber(10);
 			if (buffsRoll < 4) {
-				w.buffs.push(buffFactory.getRandomDamageBuff(1,4));
+				w.buffs.push(buffFactory.getRandomDamageBuff(1, 4));
 			}
 
 			return w;
 		};
+
+		self.getRandomTier1Weapon = function () {
+			var item = rogueDeckDictionary.weaponTypes.getTier1WeaponType();
+			return getWeaponFromItem(item);
+		};
+
+
+		self.getRandomTier2Weapon = function () {
+			var item = rogueDeckDictionary.weaponTypes.getTier2WeaponType();
+			return getWeaponFromItem(item);
+		};
+
+		self.getRandomTier3Weapon = function () {
+			var item = rogueDeckDictionary.weaponTypes.getTier3WeaponType();
+			return getWeaponFromItem(item);
+		};
+
+		self.getRandomTier4Weapon = function () {
+			var item = rogueDeckDictionary.weaponTypes.getTier4WeaponType();
+			return getWeaponFromItem(item);
+		};
+
+		self.getRandomTier5Weapon = function () {
+			var item = rogueDeckDictionary.weaponTypes.getTier5WeaponType();
+			return getWeaponFromItem(item);
+		};
+
+		window.weaponFactory = self;
 	}
 
 	var armorFactory = new function () {
 		var self = this;
+		var getArmorFromItem = function (item) {
 
-		self.getRandomTier1Armor = function () {
-			var item = rogueDeckDictionary.armorTypes.getTier1ArmorType();
 			var a = new armor(item.name, item.modifier, []);
 			var buffsRoll = window.utils.getRandomNumber(10);
 			if (buffsRoll < 4) {
@@ -503,6 +581,31 @@
 			}
 
 			return a;
+		};
+
+		self.getRandomTier1Armor = function () {
+			var item = rogueDeckDictionary.armorTypes.getTier1ArmorType();
+			return getArmorFromItem(item);
+		};
+
+		self.getRandomTier2Armor = function () {
+			var item = rogueDeckDictionary.armorTypes.getTier2ArmorType();
+			return getArmorFromItem(item);
+		};
+
+		self.getRandomTier3Armor = function () {
+			var item = rogueDeckDictionary.armorTypes.getTier3ArmorType();
+			return getArmorFromItem(item);
+		};
+
+		self.getRandomTier4Armor = function () {
+			var item = rogueDeckDictionary.armorTypes.getTier4ArmorType();
+			return getArmorFromItem(item);
+		};
+
+		self.getRandomTier5Armor = function () {
+			var item = rogueDeckDictionary.armorTypes.getTier5ArmorType();
+			return getArmorFromItem(item);
 		};
 	};
 
