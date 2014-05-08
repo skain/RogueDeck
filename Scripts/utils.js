@@ -54,5 +54,29 @@
 			var index = utils.getRandomNumber(array.length - 1) - 1;
 			return array[index];
 		};
+
+		utils.getWeightedRandomNumber = function (min, max) {
+			if (!min) {
+				throw 'min must be supplied';
+			}
+
+			if (!max) {
+				throw 'max must be supplied';
+			}
+			var numNumbers = (max - min) + 1;
+			var roll = Math.floor((Math.random() * 100) + 1);
+
+			var pct = (2 / numNumbers); //percents get smaller as number of possible numbers goes up
+
+			var remaining = 100;
+			for (var i = 0; i < numNumbers; i++) {
+				remaining = remaining - (remaining * pct);
+				if (roll >= remaining) {
+					return i + min;
+				}
+			}
+
+			return min;
+		};
 	};
 })(window);

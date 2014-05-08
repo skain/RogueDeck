@@ -4,31 +4,93 @@
 		var self = this;
 
 		self.createRandomLootCard = function () {
-			var rnd = window.utils.getRandomNumber(10);
+			//var rnd = window.utils.getRandomNumber(10);
 			var type, verb, value;
-			if (rnd < 3) {
-				type = 'food';
-				verb = 'eat';
-				value = 10;
-			} else if (rnd < 5) {
-				type = 'health potion';
-				verb = 'use';
-				var size = window.utils.getRandomNumber(10);
-				if (size < 5) {
-					type = 'small ' + type;
-					value = 10;
-				} else if (size < 8) {
-					type = 'medium ' + type;
-					value = 20;
-				} else {
-					type = 'large ' + type;
-					value = 30;
-				}
-			} else {
-				type = 'other thing';
-				verb = 'use';
-			}
+			//if (rnd < 3) {
+			//	type = 'food';
+			//	verb = 'eat';
+			//	value = 10;
+			//} else if (rnd < 5) {
+			//	type = 'health potion';
+			//	verb = 'use';
+			//	var size = window.utils.getRandomNumber(10);
+			//	if (size < 5) {
+			//		type = 'small ' + type;
+			//		value = 10;
+			//	} else if (size < 8) {
+			//		type = 'medium ' + type;
+			//		value = 20;
+			//	} else {
+			//		type = 'large ' + type;
+			//		value = 30;
+			//	}
+			//} else {
+			//	type = 'other thing';
+			//	verb = 'use';
+			//}
 
+			var rnd = window.utils.getWeightedRandomNumber(1, 3);
+			switch (rnd) {
+				case 1:
+					//other thing
+					type = 'useless thing';
+					verb = 'discard';
+					break;
+				case 2:
+					//food
+					type = 'food';
+					verb = 'eat';
+					value = 10;
+					break;
+				case 3:
+					//health
+					type = 'health potion';
+					verb = 'use'
+					var size = window.utils.getWeightedRandomNumber(1, 3);
+					switch (size) {
+						case 1:
+							type = 'small ' + type;
+							value = 10;
+							break;
+						case 2:
+							type = 'medium ' + type;
+							value = 20;
+							break;
+						case 3:
+							type = 'large ' + type;
+							value = 30;
+							break;
+					}
+					break;
+				case 4:
+					//weapon or armor
+					var rnd = window.utils.getRandomNumberBetween(1, 2);
+					var tier = window.utils.getWeightedRandomNumber(1, 5);
+					if (rnd == 1) {
+						//weapon
+						var weapon = null;
+						switch (tier) {
+							case 1:
+								weapon = weaponFactory.getRandomTier1Weapon();
+								break;
+							case 2:
+								weapon = weaponFactory.getRandomTier2Weapon();
+								break;
+							case 3:
+								weapon = weaponFactory.getRandomTier3Weapon();
+								break;
+							case 4:
+								weapon = weaponFactory.getRandomTier4Weapon();
+								break;
+							case 5:
+								weapon = weaponFactory.getRandomTier5Weapon();
+								break;
+						}
+					} else {
+						//armor
+					}
+					break;
+			}
 			return new lootCard(self, type, verb, value);
 		}
 
@@ -446,37 +508,15 @@
 
 	var buffFactory = new function () {
 		var self = this;
-		self.getRandomBuffValue = function (min, max) {
-			if (!min) {
-				throw 'min must be supplied';
-			}
-
-			if (!max) {
-				throw 'max must be supplied';
-			}
-			var numNumbers = (max - min) + 1;
-			var roll = Math.floor((Math.random() * 100) + 1);
-
-			var pct = (2 / numNumbers); //percents get smaller as number of possible numbers goes up
-
-			var remaining = 100;
-			for (var i = 0; i < numNumbers; i++) {
-				remaining = remaining - (remaining * pct);
-				if (roll >= remaining) {
-					return i + min;
-				}
-			}
-
-			return min;
-		};
 
 		self.getRandomDamageBuff = function (min, max) {
-			var val = self.getRandomBuffValue(min, max);
+			var val = window.utils.getWeightedRandomNumber(min, max);
+			//var val = self.getRandomBuffValue(min, max);
 			return new buff(val, null);
 		};
 
 		self.getRandomDefenseBuff = function (min, max) {
-			var val = self.getRandomBuffValue(min, max);
+			var val = window.utils.getWeightedRandomNumber(min, max);
 			return new buff(null, val);
 		};
 	};
