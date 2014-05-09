@@ -71,6 +71,41 @@
 		self.verb = verb;
 		self.value = value;
 		self.droppedBy = 'There is a ';
+		self.imageUrl = ko.observable();
+		self.displayName = ko.computed(function () {
+			if (self.value && self.value.displayName) {
+				return self.value.displayName();
+			}
+
+			return type;
+		});
+		var setImageUrl = function () {
+			var imageSearch = null;
+			function callback() {
+				// Check that we got results
+				console.log('callback');
+				if (imageSearch.results && imageSearch.results.length > 0) {
+					var index = window.utils.getRandomNumberBetween(0, imageSearch.results.length - 1);
+					self.imageUrl(imageSearch.results[index].tbUrl);
+				}
+			};
+
+			function doImageSearch() {
+				imageSearch = new google.search.ImageSearch();
+
+				imageSearch.setSearchCompleteCallback(this, callback, null);
+
+				imageSearch.execute(self.displayName());
+				imageSearch.gotoPage(window.utils.getRandomNumberBetween(0, 20));
+
+				// Include the required Google branding
+				google.search.Search.getBranding('GoogleBranding');
+			};
+
+			doImageSearch();
+		};
+
+		setImageUrl();
 	}
 
 	var monsterCard = function (type, name, attack, defense, hitPoints) {

@@ -101,7 +101,9 @@
 			<div class="col-sm-4" id="LootDiv">
 				<h3>Loot</h3>
 				<ul data-bind="foreach: loot">
-					<li><span data-bind="text: droppedBy"></span> <span data-bind="text: type"></span> <span class="badgesSpan" data-bind="if: value && value.buffs"><span data-bind="template: { name: 'BuffsBadgesTemplate', foreach: value.buffs }"></span></span> here. <a href="javascript:void(0);" data-bind="click:window.rogueGame.takeItem">Take</a></li>
+					<li><span data-bind="text: droppedBy"></span> <span data-bind="text: type"></span> <span class="badgesSpan" data-bind="if: value && value.buffs"><span data-bind="template: { name: 'BuffsBadgesTemplate', foreach: value.buffs }"></span></span> here. <a href="javascript:void(0);" data-bind="click:window.rogueGame.takeItem">Take</a>
+						<img data-bind="attr: { src: imageUrl }" />
+					</li>
 				</ul>
 			</div>
 		</div>
@@ -149,6 +151,7 @@
 				<ul data-bind="foreach: lootCards">
 					<li>
 						[<a href="javascript:void(0);" data-bind="text: verb, click:window.rogueGame.useItem"></a>] [<a href="javascript:void(0);" data-bind="click:window.rogueGame.dropItem">drop</a>] <span data-bind="text: type"></span> <span class="badgesSpan" data-bind="if: value.buffs"><span data-bind="template: { name: 'BuffsBadgesTemplate', foreach: value.buffs }"></span></span>
+						<img data-bind="attr: { src: imageUrl }" />
 					</li>
 				</ul>
 			</div>
@@ -169,14 +172,16 @@
 			<a href="javascript:void(0)" data-bind="click: window.rogueGame.clearMessageLog">Clear all messages</a>
 		</div>
 	</div>
-
+	<div id="GoogleBranding"></div>
 	<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
 	<script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 	<script src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-3.0.0.js"></script>
+	<script src="https://www.google.com/jsapi"></script>
 	<script src="scripts/utils.js"></script>
 	<script src="scripts/rogueDeckDictionary.js"></script>
 	<script src="scripts/rogueDeckGame.js"></script>
 	<script type="text/javascript" id="PageCode">
+		google.load('search', '1');
 		$(document).ready(function () {
 			rogueGame.startGameAndGetFirstRoom();
 			ko.applyBindings(window.rogueGame);
