@@ -51,10 +51,10 @@
 		self.armorTypes = new function () {
 			var self = this;
 			var tier1 = [new itemDetailModifier('Cloth Armor', 1, 3)];
-			var tier3 = [new itemDetailModifier('Chain Armor', 4, 6)];
-			var tier4 = [new itemDetailModifier('Scale Armor', 7, 9)];
-			var tier5 = [new itemDetailModifier('Plate Armor', 10, 12)];
-			var tier2 = [new itemDetailModifier('Leather Armor', 13, 15)];
+			var tier2 = [new itemDetailModifier('Leather Armor', 4, 6)];
+			var tier3 = [new itemDetailModifier('Chain Armor', 7, 9)];
+			var tier4 = [new itemDetailModifier('Scale Armor', 10, 12)];
+			var tier5 = [new itemDetailModifier('Plate Armor', 13, 15)];
 
 			self.getTier1ArmorType = function () {
 				return window.utils.getRandomElementFromArray(tier1);
@@ -70,6 +70,10 @@
 
 			self.getTier4ArmorType = function () {
 				return window.utils.getRandomElementFromArray(tier4);
+			};
+
+			self.getTier5ArmorType = function () {
+				return window.utils.getRandomElementFromArray(tier5);
 			};
 		};
 	};

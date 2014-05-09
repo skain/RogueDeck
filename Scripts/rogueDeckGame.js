@@ -3,110 +3,12 @@
 	var rogueDeckManager = function () {
 		var self = this;
 
-		self.createRandomLootCard = function () {
-			var type, verb, value;
-
-			var rnd = window.utils.getWeightedRandomNumber(1, 10);
-			switch (rnd) {
-				case 1:
-					//other thing
-					type = 'useless thing';
-					verb = 'discard';
-					break;
-				case 2:
-					//food
-					type = 'food';
-					verb = 'eat';
-					value = 10;
-					break;
-				case 3:
-					//health
-					type = 'health potion';
-					verb = 'use'
-					var size = window.utils.getWeightedRandomNumber(1, 3);
-					switch (size) {
-						case 1:
-							type = 'small ' + type;
-							value = 10;
-							break;
-						case 2:
-							type = 'medium ' + type;
-							value = 20;
-							break;
-						case 3:
-							type = 'large ' + type;
-							value = 30;
-							break;
-					}
-					break;
-				case 4:
-				case 5:
-				case 6:
-				case 7:
-				case 8:
-				case 9:
-				case 10:
-					//weapon or armor
-					var rnd = window.utils.getRandomNumberBetween(1, 2);
-					var tier = window.utils.getWeightedRandomNumber(1, 5);
-					if (rnd == 1) {
-						//weapon
-						var weapon = null;
-						switch (tier) {
-							case 1:
-								weapon = weaponFactory.getRandomTier1Weapon();
-								break;
-							case 2:
-								weapon = weaponFactory.getRandomTier2Weapon();
-								break;
-							case 3:
-								weapon = weaponFactory.getRandomTier3Weapon();
-								break;
-							case 4:
-								weapon = weaponFactory.getRandomTier4Weapon();
-								break;
-							case 5:
-								weapon = weaponFactory.getRandomTier5Weapon();
-								break;
-						}
-						type = weapon.displayName();
-						value = weapon;
-						verb = 'equip';
-					} else {
-						//armor
-						var armor = null;
-						switch (tier) {
-							case 1:
-								armor = armorFactory.getRandomTier1Armor();
-								break;
-							case 2:
-								armor = armorFactory.getRandomTier2Armor();
-								break;
-							case 3:
-								armor = armorFactory.getRandomTier3Armor();
-								break;
-							case 4:
-								armor = armorFactory.getRandomTier4Armor();
-								break;
-							case 5:
-								armor = armorFactory.getRandomTier5Armor();
-								break;
-						}
-						type = armor.displayName();
-						value = armor;
-						verb = 'equip';
-					}
-					break;
-			}
-			return new lootCard(self, type, verb, value);
-		}
-
 		self.createRandomMonsterCard = function () {
 			var attack = window.utils.getRandomNumberBetween(5, 15);
 			var defense = window.utils.getRandomNumberBetween(5, 15);
 			var hitPoints = window.utils.getRandomNumberBetween(3, 15);
 
-			return new monsterCard(self, 'Monster', 'Monster!', attack, defense, hitPoints);
+			return new monsterCard('Monster', 'Monster!', attack, defense, hitPoints);
 		}
 
 		self.createRandomAreaCard = function (isFirstCard) {
@@ -123,7 +25,7 @@
 				if (cardType == 'room') {
 					var numLoot = Math.floor(cardSizeInt / 2);
 					for (var i = 0; i < numLoot; i++) {
-						var lc = self.createRandomLootCard();
+						var lc = lootFactory.getRandomLootCard();
 						if (lc) {
 							cardLoot.push(lc);
 						}
@@ -141,7 +43,7 @@
 				}
 			}
 
-			return new areaCard(self, cardMonsters, cardLoot, cardType, cardSizeInt);
+			return new areaCard(cardMonsters, cardLoot, cardType, cardSizeInt);
 		};
 	};
 
@@ -163,18 +65,16 @@
 		self.direction = direction || self.getRandomDirection();
 	}
 
-	var lootCard = function (deck, type, verb, value) {
+	var lootCard = function (type, verb, value) {
 		var self = this;
-		self.deck = deck;
 		self.type = type;
 		self.verb = verb;
 		self.value = value;
 		self.droppedBy = 'There is a ';
 	}
 
-	var monsterCard = function (deck, type, name, attack, defense, hitPoints) {
+	var monsterCard = function (type, name, attack, defense, hitPoints) {
 		var self = this;
-		self.deck = deck;
 		self.type = type || "Monster";
 		self.name = ko.observable(name);
 		self.attack = ko.observable(attack || 1);
@@ -199,9 +99,8 @@
 		}
 	}
 
-	var areaCard = function (deck, monsters, loot, type, sizeInt) {
+	var areaCard = function (monsters, loot, type, sizeInt) {
 		var self = this;
-		self.deck = deck;
 		self.monsters = ko.observableArray(monsters || []);
 		self.loot = ko.observableArray(loot || []);
 		self.doors = ko.observableArray([]);
@@ -239,7 +138,7 @@
 		}
 
 		self.addMonsterDrop = function (monster) {
-			var lc = deck.createRandomLootCard();
+			var lc = lootFactory.getRandomLootCard();
 			lc.droppedBy = monster.name() + ' dropped a ';
 			self.loot.push(lc);
 		}
@@ -269,6 +168,7 @@
 			}
 			return dmg;
 		});
+		self.isWeapon = true;
 	};
 
 	var armor = function (name, baseDefense, buffs) {
@@ -289,6 +189,7 @@
 			}
 			return def;
 		});
+		self.isArmor = true;
 	}
 
 	var roguePlayer = function (name) {
@@ -346,8 +247,9 @@
 					window.rogueGame.addMessageToLog('You gained ' + gained + '/' + lootCard.value + ' hit points.');
 					break;
 				default:
-					if (verb == 'equip') {
+					if (lootCard.verb == 'equip') {
 						self.equipItem(lootCard.value);
+						self.lootCards.remove(lootCard);
 					} else {
 						window.rogueGame.addMessageToLog('Nothing happened');
 					}
@@ -356,23 +258,25 @@
 		};
 
 		self.equipItem = function (item) {
-			switch (item.type) {
-				case 'weapon':
-					self.equipWeapon(item);
-					break;
-				case 'armor':
-					self.equipArmor(item);
-					break;
+			if (item.isWeapon) {
+				self.equipWeapon(item);
+			} else if (item.isArmor) {
+				self.equipArmor(item);
 			}
 		};
 
 		self.equipWeapon = function (item) {
-			throw 'not implemented yet'
+			var curWeapon = self.weapon();
+			var toInv = lootFactory.createFromItem(curWeapon, 'equip');
+			self.weapon(item);
+			self.lootCards.push(toInv);
 		};
 
 		self.equipArmor = function (item) {
-
-			throw 'not implemented yet'
+			var curArmor = self.armor();
+			var toInv = lootFactory.createFromItem(curArmor, 'equip');
+			self.armor(item);
+			self.lootCards.push(toInv);
 		};
 	}
 
@@ -484,6 +388,12 @@
 			self.player().useLootCard(lootCard);
 			processTurnCompletion();
 		};
+
+		self.dropItem = function (lootCard) {
+			self.addMessageToLog('You dropped the ' + lootCard.type);
+			self.player().lootCards.remove(lootCard);
+			self.currentAreaCard().loot.push(lootCard);
+		}
 
 		var processEndGame = function () {
 			var gameOver = false;
@@ -623,6 +533,105 @@
 			return new buff(null, val);
 		};
 	};
+
+	var lootFactory = new function () {
+		var self = this;
+		self.getRandomLootCard = function () {
+			var type, verb, value, lc;
+			var rnd = window.utils.getWeightedRandomNumber(1, 10);
+			switch (rnd) {
+				case 1:
+					//other thing
+					lc = new lootCard('useless thing', 'discard', null);
+					break;
+				case 2:
+				case 3:
+					//food
+					lc = new lootCard('food', 'eat', 10);
+					break;
+				case 4:
+					//health
+					type = 'health potion';
+					verb = 'use'
+					var size = window.utils.getWeightedRandomNumber(1, 3);
+					switch (size) {
+						case 1:
+							type = 'small ' + type;
+							value = 10;
+							break;
+						case 2:
+							type = 'medium ' + type;
+							value = 20;
+							break;
+						case 3:
+							type = 'large ' + type;
+							value = 30;
+							break;
+					}
+					lc = new lootCard(type, verb, value);
+					break;
+				case 5:
+				case 6:
+				case 7:
+				case 8:
+				case 9:
+				case 10:
+					//weapon or armor
+					var rnd = window.utils.getRandomNumberBetween(1, 2);
+					var tier = window.utils.getWeightedRandomNumber(1, 5);
+					if (rnd == 1) {
+						//weapon
+						var weapon = null;
+						switch (tier) {
+							case 1:
+								weapon = weaponFactory.getRandomTier1Weapon();
+								break;
+							case 2:
+								weapon = weaponFactory.getRandomTier2Weapon();
+								break;
+							case 3:
+								weapon = weaponFactory.getRandomTier3Weapon();
+								break;
+							case 4:
+								weapon = weaponFactory.getRandomTier4Weapon();
+								break;
+							case 5:
+								weapon = weaponFactory.getRandomTier5Weapon();
+								break;
+						}
+						lc = self.createFromItem(weapon, 'equip');
+					} else {
+						//armor
+						var armor = null;
+						switch (tier) {
+							case 1:
+								armor = armorFactory.getRandomTier1Armor();
+								break;
+							case 2:
+								armor = armorFactory.getRandomTier2Armor();
+								break;
+							case 3:
+								armor = armorFactory.getRandomTier3Armor();
+								break;
+							case 4:
+								armor = armorFactory.getRandomTier4Armor();
+								break;
+							case 5:
+								armor = armorFactory.getRandomTier5Armor();
+								break;
+						}
+						lc = self.createFromItem(armor, 'equip');
+
+					}
+					break;
+			}
+			return lc;
+		};
+
+		self.createFromItem = function (item, verb) {
+			return new lootCard(item.displayName(), verb, item);
+		};
+	}
 	//end factories
 
 	window.rogueGame = new rogueGame();
