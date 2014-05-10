@@ -83,6 +83,10 @@
 			var imageSearch = null;
 			function callback() {
 				// Check that we got results
+<<<<<<< HEAD
+=======
+				console.log('callback');
+>>>>>>> e04df6e2e27a298d501f6cef9bb532b09cdcd7c6
 				if (imageSearch.results && imageSearch.results.length > 0) {
 					var index = window.utils.getRandomNumberBetween(0, imageSearch.results.length - 1);
 					self.imageUrl(imageSearch.results[index].tbUrl);

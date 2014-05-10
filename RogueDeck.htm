@@ -106,9 +106,14 @@
 			<div class="col-sm-4" id="LootDiv">
 				<h3>Loot</h3>
 				<ul data-bind="foreach: loot">
+<<<<<<< HEAD
 					<li>
 						<span data-bind="text: droppedBy"></span> <span data-bind="text: type"></span> <span class="badgesSpan" data-bind="if: value && value.buffs"><span data-bind="template: { name: 'BuffsBadgesTemplate', foreach: value.buffs }"></span></span> here. <a href="javascript:void(0);" data-bind="click:window.rogueGame.takeItem">Take</a>
 						<img class="itemImg" data-bind="attr: { src: imageUrl }" />
+=======
+					<li><span data-bind="text: droppedBy"></span> <span data-bind="text: type"></span> <span class="badgesSpan" data-bind="if: value && value.buffs"><span data-bind="template: { name: 'BuffsBadgesTemplate', foreach: value.buffs }"></span></span> here. <a href="javascript:void(0);" data-bind="click:window.rogueGame.takeItem">Take</a>
+						<img data-bind="attr: { src: imageUrl }" />
+>>>>>>> e04df6e2e27a298d501f6cef9bb532b09cdcd7c6
 					</li>
 				</ul>
 			</div>
@@ -157,7 +162,11 @@
 				<ul data-bind="foreach: lootCards">
 					<li>
 						[<a href="javascript:void(0);" data-bind="text: verb, click:window.rogueGame.useItem"></a>] [<a href="javascript:void(0);" data-bind="click:window.rogueGame.dropItem">drop</a>] <span data-bind="text: type"></span> <span class="badgesSpan" data-bind="if: value.buffs"><span data-bind="template: { name: 'BuffsBadgesTemplate', foreach: value.buffs }"></span></span>
+<<<<<<< HEAD
 						<img class="itemImg" data-bind="attr: { src: imageUrl }" />
+=======
+						<img data-bind="attr: { src: imageUrl }" />
+>>>>>>> e04df6e2e27a298d501f6cef9bb532b09cdcd7c6
 					</li>
 				</ul>
 			</div>
