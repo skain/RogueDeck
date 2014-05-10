@@ -71,6 +71,40 @@
 		self.verb = verb;
 		self.value = value;
 		self.droppedBy = 'There is a ';
+		self.imageUrl = ko.observable();
+		self.displayName = ko.computed(function () {
+			if (self.value && self.value.displayName) {
+				return self.value.displayName();
+			}
+
+			return type;
+		});
+		var setImageUrl = function () {
+			var imageSearch = null;
+			function callback() {
+				// Check that we got results
+				if (imageSearch.results && imageSearch.results.length > 0) {
+					var index = window.utils.getRandomNumberBetween(0, imageSearch.results.length - 1);
+					self.imageUrl(imageSearch.results[index].tbUrl);
+				}
+			};
+
+			function doImageSearch() {
+				imageSearch = new google.search.ImageSearch();
+
+				imageSearch.setSearchCompleteCallback(this, callback, null);
+
+				imageSearch.execute(self.displayName());
+				imageSearch.gotoPage(window.utils.getRandomNumberBetween(0, 20));
+
+				// Include the required Google branding
+				google.search.Search.getBranding('GoogleBranding');
+			};
+
+			doImageSearch();
+		};
+
+		setImageUrl();
 	}
 
 	var monsterCard = function (type, name, attack, defense, hitPoints) {
@@ -205,16 +239,25 @@
 		self.maxStomach = ko.observable(20 + self.vitality());
 		self.stomach = ko.observable(self.maxStomach());
 		self.lootCards = ko.observableArray();
-		self.armor = ko.observable(armorFactory.getRandomTier1Armor());
+		self.armor = ko.observable(getStartingArmor());
 		self.defense = ko.computed(function () {
-			return self.dexterity() + self.armor().totalDefense();
+			return self.dexterity() + self.armor().value.totalDefense();
 		});
-		self.weapon = ko.observable(weaponFactory.getRandomTier1Weapon());
+		self.weapon = ko.observable(getStartingWeapon());
 		self.attack = ko.computed(function () {
-			return self.strength() + self.weapon().totalToHit();
+			return self.strength() + self.weapon().value.totalToHit();
 		});
 		self.isPlayer = true;
 
+		function getStartingArmor() {
+			var armor = armorFactory.getRandomTier1Armor();
+			return new lootCard(armor.displayName(), 'equip', armor);
+		}
+
+		function getStartingWeapon() {
+			var weapon = weaponFactory.getRandomTier1Weapon();
+			return new lootCard(weapon.displayName(), 'equip', weapon);
+		}
 		self.useLootCard = function (lootCard) {
 			if (self.lootCards.indexOf(lootCard) < 0) {
 				window.rogueGame.addMessageToLog('You can\'t use that loot card!');
@@ -248,7 +291,7 @@
 					break;
 				default:
 					if (lootCard.verb == 'equip') {
-						self.equipItem(lootCard.value);
+						self.equipLootCard(lootCard);
 						self.lootCards.remove(lootCard);
 					} else {
 						window.rogueGame.addMessageToLog('Nothing happened');
@@ -257,26 +300,24 @@
 			}
 		};
 
-		self.equipItem = function (item) {
-			if (item.isWeapon) {
-				self.equipWeapon(item);
-			} else if (item.isArmor) {
-				self.equipArmor(item);
+		self.equipLootCard = function (lootCard) {
+			if (lootCard.value.isWeapon) {
+				self.equipWeapon(lootCard);
+			} else if (lootCard.value.isArmor) {
+				self.equipArmor(lootCard);
 			}
 		};
 
-		self.equipWeapon = function (item) {
+		self.equipWeapon = function (lootCard) {
 			var curWeapon = self.weapon();
-			var toInv = lootFactory.createFromItem(curWeapon, 'equip');
-			self.weapon(item);
-			self.lootCards.push(toInv);
+			self.weapon(lootCard);
+			self.lootCards.push(curWeapon);
 		};
 
-		self.equipArmor = function (item) {
+		self.equipArmor = function (lootCard) {
 			var curArmor = self.armor();
-			var toInv = lootFactory.createFromItem(curArmor, 'equip');
-			self.armor(item);
-			self.lootCards.push(toInv);
+			self.armor(lootCard);
+			self.lootCards.push(curArmor);
 		};
 	}
 

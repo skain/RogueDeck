@@ -56,6 +56,11 @@
 		.statusAlert {
 			background-color: rgba(255, 0, 0, .3);
 		}
+
+		.itemImg {
+			max-width: 80px;
+			max-height: 80px;
+		}
 	</style>
 </head>
 <body>
@@ -101,7 +106,10 @@
 			<div class="col-sm-4" id="LootDiv">
 				<h3>Loot</h3>
 				<ul data-bind="foreach: loot">
-					<li><span data-bind="text: droppedBy"></span> <span data-bind="text: type"></span> <span class="badgesSpan" data-bind="if: value && value.buffs"><span data-bind="template: { name: 'BuffsBadgesTemplate', foreach: value.buffs }"></span></span> here. <a href="javascript:void(0);" data-bind="click:window.rogueGame.takeItem">Take</a></li>
+					<li>
+						<span data-bind="text: droppedBy"></span> <span data-bind="text: type"></span> <span class="badgesSpan" data-bind="if: value && value.buffs"><span data-bind="template: { name: 'BuffsBadgesTemplate', foreach: value.buffs }"></span></span> here. <a href="javascript:void(0);" data-bind="click:window.rogueGame.takeItem">Take</a>
+						<img class="itemImg" data-bind="attr: { src: imageUrl }" />
+					</li>
 				</ul>
 			</div>
 		</div>
@@ -149,14 +157,21 @@
 				<ul data-bind="foreach: lootCards">
 					<li>
 						[<a href="javascript:void(0);" data-bind="text: verb, click:window.rogueGame.useItem"></a>] [<a href="javascript:void(0);" data-bind="click:window.rogueGame.dropItem">drop</a>] <span data-bind="text: type"></span> <span class="badgesSpan" data-bind="if: value.buffs"><span data-bind="template: { name: 'BuffsBadgesTemplate', foreach: value.buffs }"></span></span>
+						<img class="itemImg" data-bind="attr: { src: imageUrl }" />
 					</li>
 				</ul>
 			</div>
 			<div class="col-sm-3">
 				<h3>Equipped</h3>
 				<ul>
-					<li><strong>Right-Hand:</strong> <span data-bind="text: weapon().displayName"></span><span class="badgesSpan" data-bind="template: { name: 'BuffsBadgesTemplate', foreach: weapon().buffs }"></span> (Dmg: <span data-bind="text: weapon().totalToHit"></span>)</li>
-					<li><strong>Armor:</strong> <span data-bind="text: armor().displayName"> </span><span class="badgesSpan" data-bind="template: { name: 'BuffsBadgesTemplate', foreach: armor().buffs }"></span> (Def: <span data-bind="text: armor().totalDefense"></span>)</li>
+					<li>
+						<strong>Right-Hand:</strong> <span data-bind="text: weapon().displayName"></span><span class="badgesSpan" data-bind="template: { name: 'BuffsBadgesTemplate', foreach: weapon().value.buffs }"></span> (Dmg: <span data-bind="text: weapon().value.totalToHit"></span>)
+						<img class="itemImg" data-bind="attr: { src: weapon().imageUrl }" />
+					</li>
+					<li>
+						<strong>Armor:</strong> <span data-bind="text: armor().displayName"> </span><span class="badgesSpan" data-bind="template: { name: 'BuffsBadgesTemplate', foreach: armor().value.buffs }"></span> (Def: <span data-bind="text: armor().value.totalDefense"></span>)
+						<img class="itemImg" data-bind="attr: { src: armor().imageUrl }" />
+					</li>
 				</ul>
 			</div>
 		</div>
@@ -169,14 +184,16 @@
 			<a href="javascript:void(0)" data-bind="click: window.rogueGame.clearMessageLog">Clear all messages</a>
 		</div>
 	</div>
-
+	<div id="GoogleBranding"></div>
 	<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
 	<script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 	<script src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-3.0.0.js"></script>
+	<script src="https://www.google.com/jsapi"></script>
 	<script src="scripts/utils.js"></script>
 	<script src="scripts/rogueDeckDictionary.js"></script>
 	<script src="scripts/rogueDeckGame.js"></script>
 	<script type="text/javascript" id="PageCode">
+		google.load('search', '1');
 		$(document).ready(function () {
 			rogueGame.startGameAndGetFirstRoom();
 			ko.applyBindings(window.rogueGame);
