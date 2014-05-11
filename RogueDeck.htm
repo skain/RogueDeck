@@ -5,63 +5,8 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>RogueDeck</title>
-	<link href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
-	<style>
-		.disabled {
-		}
-
-			.disabled:after {
-				display: block;
-				position: absolute;
-				height: 100%;
-				width: 100%;
-				background-color: Black;
-				opacity: .2;
-				content: ' ';
-				top: 0px;
-				left: 0px;
-				z-index: 99;
-			}
-
-		div#MessageLogDiv {
-			margin-top: 20px;
-		}
-
-			div#MessageLogDiv .alert {
-				margin-bottom: 5px;
-			}
-
-		#AlertDiv {
-			width: 500px;
-			height: 200px;
-			margin: 0 auto;
-			background: #f7f7f7;
-			position: absolute;
-			left: 50%;
-			top: 50%;
-			margin-left: -250px;
-			margin-top: -100px;
-			z-index: 100;
-			text-align: center;
-			display: none;
-			border: solid 2px red;
-			opacity: .8;
-		}
-
-		#AlertMsg {
-			text-align: center;
-			line-height: 160px;
-		}
-
-		.statusAlert {
-			background-color: rgba(255, 0, 0, .3);
-		}
-
-		.itemImg {
-			max-width: 80px;
-			max-height: 80px;
-		}
-	</style>
+	<link href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet" />
+	<link rel="stylesheet" type="text/css" href="styles.css"/>
 </head>
 <body>
 	<div class="container">
@@ -70,11 +15,11 @@
 			<button data-bind="click: startNewGame">OK</button>
 		</div>
 		<div class="row">
-			<h1>RogueDeck</h1>
+			<h1 style="float:left; margin-right: 10px;">RogueDeck</h1>
 		</div>
 		<div class="row" data-bind="with: currentAreaCard">
 			<div class="col-sm-4" id="AreaDiv">
-				<h3>Area</h3>
+				<h3>Area (Steps: <span data-bind="text: window.rogueGame.stepsTaken"></span>)</h3>
 				<div>
 					<h4>You are in a <span data-bind="text: sizeText"></span> <span data-bind="text: type"></span></h4>
 					<ul class="doorsList" data-bind="foreach: doors, css: { disabled: monsters().length > 0 }">
@@ -177,7 +122,7 @@
 		</div>
 		<div class="row" id="MessageLogDiv" data-bind="foreach: messageLog">
 			<div data-bind="attr: { class: 'alert alert-' + $data.level }">
-				<div class="col-sm-1"><span class="badge" data-bind="text:$data.index"></span></div><div class="col-sm-11"><span data-bind="text:$data.message"></span></div><div style="clear: both"></div>
+				<div class="col-sm-1"></div><div class="col-sm-11"><span data-bind="text:$data.message"></span></div><div style="clear: both"></div>
 			</div>
 		</div>
 		<div class="row" data-bind="visible: messageLog().length > 0">

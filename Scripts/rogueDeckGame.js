@@ -95,7 +95,7 @@
 				imageSearch.setSearchCompleteCallback(this, callback, null);
 
 				imageSearch.execute(self.displayName());
-				imageSearch.gotoPage(window.utils.getRandomNumberBetween(0, 20));
+				imageSearch.gotoPage(window.utils.getRandomNumberBetween(0, 100));
 
 				// Include the required Google branding
 				google.search.Search.getBranding('GoogleBranding');
@@ -353,14 +353,14 @@
 		self.player = ko.observable(null);
 		self.messageLog = ko.observableArray();
 		self.curTurnIndex = ko.observable(0);
+		self.stepsTaken = ko.observable(0);
 
 		var rogueDeck = new rogueDeckManager();
 
 		self.addMessageToLog = function (msg, level) {
 			level = level || 'info';
 
-			self.curTurnIndex(self.curTurnIndex() + 1);
-			self.messageLog.unshift({ message: msg, level: level, index: self.curTurnIndex() });
+			self.messageLog.unshift({ message: msg, level: level });
 			if (self.messageLog().length == 7) {
 				self.messageLog.pop();
 			}
@@ -372,28 +372,37 @@
 
 		self.rerollCharacter = function () {
 			self.addMessageToLog("Re-rolling character.", 'info');
-			self.curTurnIndex(0);
 			self.startGameAndGetFirstRoom();
 		};
 		self.startGameAndGetFirstRoom = function () {
 			self.addMessageToLog("New game begun.");
 			self.player(new roguePlayer("Steve"));
+			self.curTurnIndex(0);
+			self.stepsTaken(0);
 			self.currentAreaCard(rogueDeck.createRandomAreaCard(true));
 		};
 
 		var processMonsterTurns = function () {
+			var gameOver = false;
 			for (var i = 0; i < self.currentAreaCard().monsters().length; i++) {
 				var monster = self.currentAreaCard().monsters()[i];
 				monster.processAttack(monster, self.player());
-				processEndGame();
+				if (processEndGame()) {
+					gameOver = true;
+					break;
+				}
 			}
+			return gameOver;
 		}
 		var processTurnCompletion = function () {
 			processMonsterTurns();
 			self.player().stomach(self.player().stomach() - 1);
-			if (self.player().stomach() < 1) {
-				self.addMessageToLog('You are hungry! (-1 HP)');
-				self.player().hitPoints(self.player().hitPoints() - 1);
+			if (processEndGame()) {
+				if (self.player().stomach() < 1) {
+					self.addMessageToLog('You are hungry! (-1 HP)');
+					self.player().hitPoints(self.player().hitPoints() - 1);
+					processEndGame();
+				}
 			}
 		}
 
@@ -402,6 +411,7 @@
 				processTurnCompletion();
 				self.currentAreaCard(rogueDeck.createRandomAreaCard(false));
 				self.addMessageToLog('You moved ' + direction);
+				self.stepsTaken(self.stepsTaken() + 1);
 				if (self.currentAreaCard().monsters().length > 0) {
 					self.addMessageToLog('There are monsters here!', 'danger');
 				}
@@ -421,13 +431,13 @@
 			self.addMessageToLog('You took the ' + lootCard.type);
 			self.player().lootCards.push(lootCard);
 			self.currentAreaCard().loot.remove(lootCard);
-			processTurnCompletion();
+			processMonsterTurns();
 		};
 
 		self.useItem = function (lootCard) {
 			self.addMessageToLog('You used the ' + lootCard.type);
 			self.player().useLootCard(lootCard);
-			processTurnCompletion();
+			processMonsterTurns();
 		};
 
 		self.dropItem = function (lootCard) {
@@ -452,6 +462,8 @@
 				$alertDiv.show();
 				$('div.container:first').addClass('disabled');
 			}
+
+			return gameOver;
 		};
 
 		self.processPlayerAttack = function (monster) {
