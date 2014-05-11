@@ -6,7 +6,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>RogueDeck</title>
 	<link href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet" />
-	<link rel="stylesheet" type="text/css" href="styles.css"/>
+	<link rel="stylesheet" type="text/css" href="styles.css" />
 </head>
 <body>
 	<div class="container">
@@ -50,72 +50,100 @@
 			</div>
 			<div class="col-sm-4" id="LootDiv">
 				<h3>Loot</h3>
-				<ul data-bind="foreach: loot">
+				<ul class="lootList" data-bind="foreach: loot">
 					<li>
-						<span data-bind="text: droppedBy"></span> <span data-bind="text: type"></span> <span class="badgesSpan" data-bind="if: value && value.buffs"><span data-bind="template: { name: 'BuffsBadgesTemplate', foreach: value.buffs }"></span></span> here. <a href="javascript:void(0);" data-bind="click:window.rogueGame.takeItem">Take</a>
-						<img class="itemImg" data-bind="attr: { src: imageUrl }" />
+						<div class="row">
+							<div class="col-sm-6" data-bind="text: droppedBy"></div>
+							<div class="col-sm-6 lootCardVerbs"><a href="javascript:void(0);" data-bind="click:window.rogueGame.takeItem">Take</a></div>
+						</div>
+						<div class="row" data-bind="template: { name: 'LootCardTemplate', data: $data }">
+						</div>
 					</li>
 				</ul>
 			</div>
 		</div>
 		<div class="row" data-bind="with:player">
 			<h3>Player: <span data-bind="text: name"></span></h3>
-			<div class="col-sm-3">
-				<h3>Stats</h3>
-				<table>
-					<tr>
-						<th>Strength</th>
-						<td data-bind="text: strength"></td>
-					</tr>
-					<tr>
-						<th>Intelligence</th>
-						<td data-bind="text: intelligence"></td>
-					</tr>
-					<tr>
-						<th>Dexterity</th>
-						<td data-bind="text: dexterity"></td>
-					</tr>
-					<tr>
-						<th>Vitality</th>
-						<td data-bind="text: vitality"></td>
-					</tr>
-				</table>
-				<div data-bind="visible: rogueGame.curTurnIndex() < 2">
-					<input type="button" value="Re-roll" data-bind="click: rogueGame.rerollCharacter" />
+			<div class="col-sm-4">
+				<div class="row">
+					<div class="col-sm-6">
+						<h3>Stats</h3>
+						<table>
+							<tr>
+								<th>Strength</th>
+								<td data-bind="text: strength"></td>
+							</tr>
+							<tr>
+								<th>Intelligence</th>
+								<td data-bind="text: intelligence"></td>
+							</tr>
+							<tr>
+								<th>Dexterity</th>
+								<td data-bind="text: dexterity"></td>
+							</tr>
+							<tr>
+								<th>Vitality</th>
+								<td data-bind="text: vitality"></td>
+							</tr>
+						</table>
+						<div data-bind="visible: rogueGame.curTurnIndex() < 2">
+							<input type="button" value="Re-roll" data-bind="click: rogueGame.rerollCharacter" />
+						</div>
+					</div>
+					<div class="col-sm-6" data-bind="css: { statusAlert: hitPoints() < 12 || stomach() < 12 }">
+						<h3>Vitals</h3>
+						<table>
+							<tr data-bind="css: { statusAlert: hitPoints() < 12 }">
+								<th>Hit Points</th>
+								<td><span data-bind="text:hitPoints"></span>(/<span data-bind="text:maxHitPoints"></span>)</td>
+							</tr>
+							<tr data-bind="css: { statusAlert: stomach() < 12 }">
+								<th>Stomach</th>
+								<td><span data-bind="text:stomach"></span>(/<span data-bind="text:maxStomach"></span>)</td>
+							</tr>
+						</table>
+					</div>
 				</div>
 			</div>
-			<div class="col-sm-3" data-bind="css: { statusAlert: hitPoints() < 12 || stomach() < 12 }">
-				<h3>Vitals</h3>
-				<table>
-					<tr data-bind="css: { statusAlert: hitPoints() < 12 }">
-						<th>Hit Points</th>
-						<td><span data-bind="text:hitPoints"></span>(/<span data-bind="text:maxHitPoints"></span>)</td>
-					</tr>
-					<tr data-bind="css: { statusAlert: stomach() < 12 }">
-						<th>Stomach</th>
-						<td><span data-bind="text:stomach"></span>(/<span data-bind="text:maxStomach"></span>)</td>
-					</tr>
-				</table>
-			</div>
-			<div class="col-sm-3">
+			<div class="col-sm-4">
 				<h3>Inventory</h3>
-				<ul data-bind="foreach: lootCards">
+				<ul class="lootList" data-bind="foreach: lootCards">
 					<li>
-						[<a href="javascript:void(0);" data-bind="text: verb, click:window.rogueGame.useItem"></a>] [<a href="javascript:void(0);" data-bind="click:window.rogueGame.dropItem">drop</a>] <span data-bind="text: type"></span> <span class="badgesSpan" data-bind="if: value.buffs"><span data-bind="template: { name: 'BuffsBadgesTemplate', foreach: value.buffs }"></span></span>
-						<img class="itemImg" data-bind="attr: { src: imageUrl }" />
+						<div class="row">
+							<div class="col-sm-12 lootCardVerbs">[<a href="javascript:void(0);" data-bind="text: verb, click:window.rogueGame.useItem"></a>] [<a href="javascript:void(0);" data-bind="click:window.rogueGame.dropItem">drop</a>]</div>
+						</div>
+						<div class="row" data-bind="template: { name: 'LootCardTemplate', data: $data }">
+						</div>
 					</li>
 				</ul>
 			</div>
-			<div class="col-sm-3">
+			<div class="col-sm-4">
 				<h3>Equipped</h3>
-				<ul>
-					<li>
+				<ul class="lootList">
+					<!--<li>
 						<strong>Right-Hand:</strong> <span data-bind="text: weapon().displayName"></span><span class="badgesSpan" data-bind="template: { name: 'BuffsBadgesTemplate', foreach: weapon().value.buffs }"></span> (Dmg: <span data-bind="text: weapon().value.totalToHit"></span>)
 						<img class="itemImg" data-bind="attr: { src: weapon().imageUrl }" />
 					</li>
 					<li>
 						<strong>Armor:</strong> <span data-bind="text: armor().displayName"> </span><span class="badgesSpan" data-bind="template: { name: 'BuffsBadgesTemplate', foreach: armor().value.buffs }"></span> (Def: <span data-bind="text: armor().value.totalDefense"></span>)
 						<img class="itemImg" data-bind="attr: { src: armor().imageUrl }" />
+					</li>-->
+
+					<li>
+						<div class="row">
+							<div class="col-sm-6"><strong>Right-Hand:</strong></div>
+							<!--<div class="col-sm-6 lootCardVerbs"><a href="javascript:void(0);" data-bind="click:window.rogueGame.takeItem">Take</a></div>-->
+						</div>
+						<div class="row" data-bind="template: { name: 'LootCardTemplate', data: weapon }">
+						</div>
+					</li>
+					<li>
+						<div class="row">
+							<div class="col-sm-6"><strong>Armor:</strong></div>
+							<!--<div class="col-sm-6 lootCardVerbs"><a href="javascript:void(0);" data-bind="click:window.rogueGame.takeItem">Take</a></div>-->
+						</div>
+						<div class="row" data-bind="template: { name: 'LootCardTemplate', data: armor }">
+						</div>
 					</li>
 				</ul>
 			</div>
@@ -147,6 +175,22 @@
 	<!-- Named Templates -->
 	<script type="text/html" id="BuffsBadgesTemplate">
 		<span data-bind="text: displayName" class="badge"></span>
+	</script>
+
+	<script type="text/html" id="LootCardTemplate">
+		<div class="col-sm-12 lootCard">
+			<div class="row">
+				<div class="col-sm-6">
+					<h4><span data-bind="text:type"></span><span class="badgesSpan" data-bind="if: value && value.buffs"><span data-bind="template: { name: 'BuffsBadgesTemplate', foreach: value.buffs }"></span></span></h4>
+					<div data-bind="if: description">
+						<span data-bind="text: description"></span>
+					</div>
+				</div>
+				<div class="col-sm-6">
+					<img class="itemImg" data-bind="attr: { src: imageUrl }" />
+				</div>
+			</div>
+		</div>
 	</script>
 </body>
 </html>

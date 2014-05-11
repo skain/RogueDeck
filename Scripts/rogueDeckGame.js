@@ -79,6 +79,13 @@
 
 			return type;
 		});
+		self.description = ko.computed(function () {
+			if (self.value && self.value.description) {
+				return self.value.description();
+			}
+
+			return null;
+		});
 		var setImageUrl = function () {
 			var imageSearch = null;
 			function callback() {
@@ -95,7 +102,9 @@
 				imageSearch.setSearchCompleteCallback(this, callback, null);
 
 				imageSearch.execute(self.displayName());
-				imageSearch.gotoPage(window.utils.getRandomNumberBetween(0, 100));
+				var page = window.utils.getRandomNumberBetween(0, 100);
+				imageSearch.gotoPage(page);
+				console.log(page);
 
 				// Include the required Google branding
 				google.search.Search.getBranding('GoogleBranding');
@@ -203,6 +212,9 @@
 			return dmg;
 		});
 		self.isWeapon = true;
+		self.description = ko.computed(function () {
+			return 'Dmg: ' + self.totalToHit();
+		})
 	};
 
 	var armor = function (name, baseDefense, buffs) {
@@ -224,6 +236,9 @@
 			return def;
 		});
 		self.isArmor = true;
+		self.description = ko.computed(function () {
+			return 'Def: ' + self.totalDefense();
+		});
 	}
 
 	var roguePlayer = function (name) {
