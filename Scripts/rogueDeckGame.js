@@ -201,7 +201,7 @@
 	};
 
 	var weapon = function (name, baseDamage, buffs) {
-		var self = this;
+		var self = {};
 		self.baseDamage = baseDamage;
 		self.buffs = ko.observableArray(window.utils.getBuffsFromArg(buffs));
 		self.name = ko.observable(name);
@@ -222,6 +222,8 @@
 		self.description = ko.computed(function () {
 			return 'Dmg: ' + self.totalToHit();
 		})
+
+		return self;
 	};
 
 	var armor = function (name, baseDefense, buffs) {
@@ -517,7 +519,7 @@
 		var self = this;
 
 		var getWeaponFromItem = function (item) {
-			var w = new weapon(item.name, item.modifier, []);
+			var w = weapon(item.name, item.modifier, []);
 			var buffsRoll = window.utils.getRandomNumber(10);
 			if (buffsRoll < 4) {
 				w.buffs.push(buffFactory.getRandomDamageBuff(1, 4));
