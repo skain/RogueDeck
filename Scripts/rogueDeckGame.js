@@ -68,7 +68,7 @@
 	}
 
 	var lootCard = function (type, verb, value) {
-		var self = this;
+		var self = {};
 		self.type = type;
 		self.verb = verb;
 		self.value = value;
@@ -116,6 +116,8 @@
 		};
 
 		setImageUrl();
+
+		return self;
 	}
 
 	var monsterCard = function (type, name, attack, defense, hitPoints) {
@@ -268,12 +270,12 @@
 
 		function getStartingArmor() {
 			var armor = armorFactory.getRandomTier1Armor();
-			return new lootCard(armor.displayName(), 'equip', armor);
+			return lootCard(armor.displayName(), 'equip', armor);
 		}
 
 		function getStartingWeapon() {
 			var weapon = weaponFactory.getRandomTier1Weapon();
-			return new lootCard(weapon.displayName(), 'equip', weapon);
+			return lootCard(weapon.displayName(), 'equip', weapon);
 		}
 		self.useLootCard = function (lootCard) {
 			if (self.lootCards.indexOf(lootCard) < 0) {
@@ -612,12 +614,12 @@
 			switch (rnd) {
 				case 1:
 					//other thing
-					lc = new lootCard('useless thing', 'discard', null);
+					lc = lootCard('useless thing', 'discard', null);
 					break;
 				case 2:
 				case 3:
 					//food
-					lc = new lootCard('food', 'eat', 10);
+					lc = lootCard('food', 'eat', 10);
 					break;
 				case 4:
 					//health
@@ -638,7 +640,7 @@
 							value = 30;
 							break;
 					}
-					lc = new lootCard(type, verb, value);
+					lc = lootCard(type, verb, value);
 					break;
 				case 5:
 				case 6:
@@ -699,7 +701,7 @@
 		};
 
 		self.createFromItem = function (item, verb) {
-			return new lootCard(item.displayName(), verb, item);
+			return lootCard(item.displayName(), verb, item);
 		};
 	}
 	//end factories
