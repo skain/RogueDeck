@@ -1,7 +1,7 @@
 (function (window) {
 	//object defs
-	var rogueDeckManager = function () {
-		var self = this;
+	var rogueDeckManager = function (factories) {
+		var self = {};
 
 		self.createRandomMonsterCard = function () {
 			var attack = window.utils.getRandomNumberBetween(5, 15);
@@ -25,7 +25,7 @@
 				if (cardType == 'room') {
 					var numLoot = Math.floor(cardSizeInt / 2);
 					for (var i = 0; i < numLoot; i++) {
-						var lc = lootFactory.getRandomLootCard();
+						var lc = factories.lootFactory.getRandomLootCard();
 						if (lc) {
 							cardLoot.push(lc);
 						}
@@ -45,6 +45,8 @@
 
 			return areaCard(cardMonsters, cardLoot, cardType, cardSizeInt);
 		};
+
+		return self;
 	};
 
 	var doorCard = function (direction) {
@@ -106,7 +108,7 @@
 				imageSearch.execute(self.displayName());
 				var page = window.utils.getRandomNumberBetween(0, 100);
 				imageSearch.gotoPage(page);
-				console.log(page);
+				//console.log(page);
 
 				// Include the required Google branding
 				google.search.Search.getBranding('GoogleBranding');
@@ -187,7 +189,7 @@
 		}
 
 		self.addMonsterDrop = function (monster) {
-			var lc = lootFactory.getRandomLootCard();
+			var lc = factories.lootFactory.getRandomLootCard();
 			lc.droppedBy = monster.name() + ' dropped a ';
 			self.loot.push(lc);
 		}
@@ -227,7 +229,7 @@
 	};
 
 	var armor = function (name, baseDefense, buffs) {
-		var self = this;
+		var self = {};
 		self.baseDefense = baseDefense;
 		self.buffs = ko.observableArray(window.utils.getBuffsFromArg(buffs));
 		self.name = ko.observable(name);
@@ -248,12 +250,16 @@
 		self.description = ko.computed(function () {
 			return 'Def: ' + self.totalDefense();
 		});
+
+		return self;
 	}
 
 	var roguePlayer = function (name) {
-		var self = this;
+		var self = {};
 		self.name = ko.observable(name);
 		self.type = 'Player';
+		self.weapon = ko.observable();
+		self.armor = ko.observable();
 		self.strength = ko.observable(window.utils.getRandomNumberBetween(5, 15));
 		self.vitality = ko.observable(window.utils.getRandomNumberBetween(5, 15));
 		self.intelligence = ko.observable(window.utils.getRandomNumberBetween(5, 15));
@@ -263,25 +269,17 @@
 		self.maxStomach = ko.observable(20 + self.vitality());
 		self.stomach = ko.observable(self.maxStomach());
 		self.lootCards = ko.observableArray();
-		self.armor = ko.observable(getStartingArmor());
 		self.defense = ko.computed(function () {
-			return self.dexterity() + self.armor().value.totalDefense();
+			var def = self.dexterity() + (self.armor && self.armor() ? self.armor().value.totalDefense() : 0);
+			console.log("Def:" + def);
+			return def;
 		});
-		self.weapon = ko.observable(getStartingWeapon());
 		self.attack = ko.computed(function () {
-			return self.strength() + self.weapon().value.totalToHit();
+			var att = self.strength() + (self.weapon && self.weapon() ? self.weapon().value.totalToHit() : 0);
+			console.log("Att:" + att);
+			return att;
 		});
 		self.isPlayer = true;
-
-		function getStartingArmor() {
-			var armor = armorFactory.getRandomTier1Armor();
-			return lootCard(armor.displayName(), 'equip', armor);
-		}
-
-		function getStartingWeapon() {
-			var weapon = weaponFactory.getRandomTier1Weapon();
-			return lootCard(weapon.displayName(), 'equip', weapon);
-		}
 		self.useLootCard = function (lootCard) {
 			if (self.lootCards.indexOf(lootCard) < 0) {
 				window.rogueGame.addMessageToLog('You can\'t use that loot card!');
@@ -335,18 +333,24 @@
 		self.equipWeapon = function (lootCard) {
 			var curWeapon = self.weapon();
 			self.weapon(lootCard);
-			self.lootCards.push(curWeapon);
+			if (curWeapon) {
+				self.lootCards.push(curWeapon);
+			}
 		};
 
 		self.equipArmor = function (lootCard) {
 			var curArmor = self.armor();
 			self.armor(lootCard);
-			self.lootCards.push(curArmor);
+			if (curArmor) {
+				self.lootCards.push(curArmor);
+			}
 		};
+
+		return self;
 	}
 
 	var buff = function (damage, defense) {
-		var self = this;
+		var self = {};
 		self.damage = damage;
 		self.defense = defense;
 		self.displayName = ko.computed(function () {
@@ -369,17 +373,30 @@
 
 			return buffs;
 		})
+
+		return self;
 	};
 
 	var rogueGame = function () {
-		var self = this;
+		var self = {};
 		self.currentAreaCard = ko.observable(null);
 		self.player = ko.observable(null);
 		self.messageLog = ko.observableArray();
 		self.curTurnIndex = ko.observable(0);
 		self.stepsTaken = ko.observable(0);
 
-		var rogueDeck = new rogueDeckManager();
+		var rogueDeck = rogueDeckManager(factories);
+
+		var getStartingArmor = function () {
+			var armor = factories.armorFactory.getRandomTier1Armor();
+			return lootCard(armor.displayName(), 'equip', armor);
+		}
+
+		var getStartingWeapon = function () {
+			var weapon = factories.weaponFactory.getRandomTier1Weapon();
+			return lootCard(weapon.displayName(), 'equip', weapon);
+		}
+
 
 		self.addMessageToLog = function (msg, level) {
 			level = level || 'info';
@@ -400,7 +417,10 @@
 		};
 		self.startGameAndGetFirstRoom = function () {
 			self.addMessageToLog("New game begun.");
-			self.player(new roguePlayer("Steve"));
+			var player = roguePlayer("Steve");
+			player.equipWeapon(getStartingWeapon());
+			player.equipArmor(getStartingArmor());
+			self.player(player);
 			self.curTurnIndex(0);
 			self.stepsTaken(0);
 			self.currentAreaCard(rogueDeck.createRandomAreaCard(true));
@@ -511,18 +531,22 @@
 			self.curTurnIndex(0);
 			window.rogueGame.startGameAndGetFirstRoom();
 		}
-	};
+
+		
+
+		return self;
+	}
 	//end object defs
 
-	//factories
-	var weaponFactory = new function () {
-		var self = this;
+	var factories = {};
+	factories.weaponFactory = (function () {
+		var self = {};
 
 		var getWeaponFromItem = function (item) {
 			var w = weapon(item.name, item.modifier, []);
 			var buffsRoll = window.utils.getRandomNumber(10);
 			if (buffsRoll < 4) {
-				w.buffs.push(buffFactory.getRandomDamageBuff(1, 4));
+				w.buffs.push(factories.buffFactory.getRandomDamageBuff(1, 4));
 			}
 
 			return w;
@@ -554,17 +578,16 @@
 			return getWeaponFromItem(item);
 		};
 
-		window.weaponFactory = self;
-	}
-
-	var armorFactory = new function () {
-		var self = this;
+		return self;
+	})();
+	factories.armorFactory = (function () {
+		var self = {};
 		var getArmorFromItem = function (item) {
 
-			var a = new armor(item.name, item.modifier, []);
+			var a = armor(item.name, item.modifier, []);
 			var buffsRoll = window.utils.getRandomNumber(10);
 			if (buffsRoll < 4) {
-				a.buffs.push(buffFactory.getRandomDefenseBuff(1, 4));
+				a.buffs.push(factories.buffFactory.getRandomDefenseBuff(1, 4));
 			}
 
 			return a;
@@ -594,25 +617,27 @@
 			var item = rogueDeckDictionary.armorTypes.getTier5ArmorType();
 			return getArmorFromItem(item);
 		};
-	};
+		return self
+	})();
 
-	var buffFactory = new function () {
-		var self = this;
+	factories.buffFactory = (function () {
+		var self = {};
 
 		self.getRandomDamageBuff = function (min, max) {
 			var val = window.utils.getWeightedRandomNumber(min, max);
 			//var val = self.getRandomBuffValue(min, max);
-			return new buff(val, null);
+			return buff(val, null);
 		};
 
 		self.getRandomDefenseBuff = function (min, max) {
 			var val = window.utils.getWeightedRandomNumber(min, max);
-			return new buff(null, val);
+			return buff(null, val);
 		};
-	};
 
-	var lootFactory = new function () {
-		var self = this;
+		return self;
+	})();
+	factories.lootFactory = (function (factories) {
+		var self = {};
 		self.getRandomLootCard = function () {
 			var type, verb, value, lc;
 			var rnd = window.utils.getWeightedRandomNumber(1, 10);
@@ -661,19 +686,19 @@
 						var weapon = null;
 						switch (tier) {
 							case 1:
-								weapon = weaponFactory.getRandomTier1Weapon();
+								weapon = factories.weaponFactory.getRandomTier1Weapon();
 								break;
 							case 2:
-								weapon = weaponFactory.getRandomTier2Weapon();
+								weapon = factories.weaponFactory.getRandomTier2Weapon();
 								break;
 							case 3:
-								weapon = weaponFactory.getRandomTier3Weapon();
+								weapon = factories.weaponFactory.getRandomTier3Weapon();
 								break;
 							case 4:
-								weapon = weaponFactory.getRandomTier4Weapon();
+								weapon = factories.weaponFactory.getRandomTier4Weapon();
 								break;
 							case 5:
-								weapon = weaponFactory.getRandomTier5Weapon();
+								weapon = factories.weaponFactory.getRandomTier5Weapon();
 								break;
 						}
 						lc = self.createFromItem(weapon, 'equip');
@@ -682,19 +707,19 @@
 						var armor = null;
 						switch (tier) {
 							case 1:
-								armor = armorFactory.getRandomTier1Armor();
+								armor = factories.armorFactory.getRandomTier1Armor();
 								break;
 							case 2:
-								armor = armorFactory.getRandomTier2Armor();
+								armor = factories.armorFactory.getRandomTier2Armor();
 								break;
 							case 3:
-								armor = armorFactory.getRandomTier3Armor();
+								armor = factories.armorFactory.getRandomTier3Armor();
 								break;
 							case 4:
-								armor = armorFactory.getRandomTier4Armor();
+								armor = factories.armorFactory.getRandomTier4Armor();
 								break;
 							case 5:
-								armor = armorFactory.getRandomTier5Armor();
+								armor = factories.armorFactory.getRandomTier5Armor();
 								break;
 						}
 						lc = self.createFromItem(armor, 'equip');
@@ -708,8 +733,9 @@
 		self.createFromItem = function (item, verb) {
 			return lootCard(item.displayName(), verb, item);
 		};
-	}
-	//end factories
 
-	window.rogueGame = new rogueGame();
+		return self;
+	})(factories);
+
+	window.rogueGame = rogueGame();
 })(window);
