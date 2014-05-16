@@ -129,23 +129,7 @@
 		self.attack = ko.observable(attack || 1);
 		self.defense = ko.observable(defense || 1);
 		self.hitPoints = ko.observable(hitPoints || 1);
-		self.fightLog = ko.observable('');
-		self.processAttack = function (attacker, defender) {
-			var attackerRoll = window.utils.getRandomNumber(10);
-			this.fightLog('<br />' + attacker.name() + ' rolls ' + attackerRoll + this.fightLog());
-			var dmg = window.utils.calculateHit(attacker.attack(), defender.defense(), attackerRoll);
-
-			if (dmg > 0) {
-				//process hit
-				defender.hitPoints(defender.hitPoints() - dmg);
-				this.fightLog('<br />' + defender.name() + ' takes ' + dmg + ' damage.' + this.fightLog());
-				window.rogueGame.addMessageToLog(attacker.name() + ' hits ' + defender.name() + ' for ' + dmg + ' HP of damage.', attacker.isPlayer ? 'success' : 'danger');
-			} else {
-				//process miss
-				this.fightLog('<br />' + attacker.name() + ' misses.' + this.fightLog());
-				window.rogueGame.addMessageToLog(attacker.name() + ' misses ' + defender.name(), attacker.isPlayer ? 'warning' : 'success');
-			}
-		}
+		self.isMonster = true;
 
 		return self;
 	}
@@ -384,6 +368,9 @@
 		self.messageLog = ko.observableArray();
 		self.curTurnIndex = ko.observable(0);
 		self.stepsTaken = ko.observable(0);
+		self.gameLevel = ko.computed(function () {
+			return Math.floor(self.stepsTaken() / 10) + 1;
+		});
 
 		var rogueDeck = rogueDeckManager(factories);
 
@@ -426,11 +413,35 @@
 			self.currentAreaCard(rogueDeck.createRandomAreaCard(true));
 		};
 
+		var processAttack = function (attacker, defender) {
+			var attackerRoll = window.utils.getRandomNumber(10);
+			var att = attacker.attack();
+			var def = defender.defense();
+
+			if (attacker.isMonster) {
+				att = att + 5 * self.gameLevel();
+			}
+
+			if (defender.isMonster) {
+				def = def + 5 * self.gameLevel();
+			}
+			var dmg = window.utils.calculateHit(att, def, attackerRoll);
+
+			if (dmg > 0) {
+				//process hit
+				defender.hitPoints(defender.hitPoints() - dmg);
+				self.addMessageToLog(attacker.name() + ' hits ' + defender.name() + ' for ' + dmg + ' HP of damage.', attacker.isPlayer ? 'success' : 'danger');
+			} else {
+				//process miss
+				self.addMessageToLog(attacker.name() + ' misses ' + defender.name(), attacker.isPlayer ? 'warning' : 'success');
+			}
+		}
+
 		var processMonsterTurns = function () {
 			var gameOver = false;
 			for (var i = 0; i < self.currentAreaCard().monsters().length; i++) {
 				var monster = self.currentAreaCard().monsters()[i];
-				monster.processAttack(monster, self.player());
+				processAttack(monster, self.player());
 				if (processEndGame()) {
 					gameOver = true;
 					break;
@@ -511,9 +522,9 @@
 		};
 
 		self.processPlayerAttack = function (monster) {
-			monster.processAttack(self.player(), monster);
+			processAttack(self.player(), monster);
 			if (monster.hitPoints() < 1) {
-				window.rogueGame.addMessageToLog('You killed the ' + monster.type);
+				self.addMessageToLog('You killed the ' + monster.type);
 				self.currentAreaCard().monsters.remove(monster);
 				self.currentAreaCard().addMonsterDrop(monster);
 			}

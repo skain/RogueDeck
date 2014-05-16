@@ -19,7 +19,7 @@
 		</div>
 		<div class="row" data-bind="with: currentAreaCard">
 			<div class="col-sm-4" id="AreaDiv">
-				<h3>Area (Steps: <span data-bind="text: window.rogueGame.stepsTaken"></span>)</h3>
+				<h3>Area (Steps: <span data-bind="text: window.rogueGame.stepsTaken"></span>/Level: <span data-bind="text: window.rogueGame.gameLevel"></span>)</h3>
 				<div>
 					<h4>You are in a <span data-bind="text: sizeText"></span> <span data-bind="text: type"></span></h4>
 					<ul class="doorsList" data-bind="foreach: doors, css: { disabled: monsters().length > 0 }">
@@ -41,8 +41,6 @@
 						</div>
 						<div>
 							<a href="javascript:void(0);" data-bind="click: window.rogueGame.processPlayerAttack">Attack!</a>
-						</div>
-						<div data-bind="html: fightLog" style="max-height: 200px; overflow-y: scroll;">
 						</div>
 					</div>
 					<!-- /ko -->
