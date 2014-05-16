@@ -43,7 +43,7 @@
 				}
 			}
 
-			return new areaCard(cardMonsters, cardLoot, cardType, cardSizeInt);
+			return areaCard(cardMonsters, cardLoot, cardType, cardSizeInt);
 		};
 	};
 
@@ -149,7 +149,7 @@
 	}
 
 	var areaCard = function (monsters, loot, type, sizeInt) {
-		var self = this;
+		var self = {};
 		self.monsters = ko.observableArray(monsters || []);
 		self.loot = ko.observableArray(loot || []);
 		self.doors = ko.observableArray([]);
@@ -197,6 +197,7 @@
 			self.doors.push(doorCard());
 		}
 
+		return self;
 	};
 
 	var weapon = function (name, baseDamage, buffs) {
