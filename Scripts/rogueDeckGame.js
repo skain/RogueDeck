@@ -8,7 +8,7 @@
 			var defense = window.utils.getRandomNumberBetween(5, 15);
 			var hitPoints = window.utils.getRandomNumberBetween(3, 15);
 
-			return new monsterCard('Monster', 'Monster!', attack, defense, hitPoints);
+			return monsterCard('Monster', 'Monster!', attack, defense, hitPoints);
 		}
 
 		self.createRandomAreaCard = function (isFirstCard) {
@@ -121,7 +121,7 @@
 	}
 
 	var monsterCard = function (type, name, attack, defense, hitPoints) {
-		var self = this;
+		var self = {};
 		self.type = type || "Monster";
 		self.name = ko.observable(name);
 		self.attack = ko.observable(attack || 1);
@@ -144,6 +144,8 @@
 				window.rogueGame.addMessageToLog(attacker.name() + ' misses ' + defender.name(), attacker.isPlayer ? 'warning' : 'success');
 			}
 		}
+
+		return self;
 	}
 
 	var areaCard = function (monsters, loot, type, sizeInt) {
