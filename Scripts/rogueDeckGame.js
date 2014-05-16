@@ -48,7 +48,7 @@
 	};
 
 	var doorCard = function (direction) {
-		var self = this;
+		var self = {};
 		self.getRandomDirection = function () {
 			var rnd = window.utils.getRandomNumber(4);
 			switch (rnd) {
@@ -63,6 +63,8 @@
 			}
 		};
 		self.direction = direction || self.getRandomDirection();
+
+		return self;
 	}
 
 	var lootCard = function (type, verb, value) {
@@ -188,7 +190,7 @@
 
 		var numDoors = Math.max(1, Math.floor(self.sizeInt / 2));
 		for (var i = 0; i < numDoors; i++) {
-			self.doors.push(new doorCard());
+			self.doors.push(doorCard());
 		}
 
 	};
