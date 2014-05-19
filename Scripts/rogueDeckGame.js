@@ -419,11 +419,11 @@
 			var def = defender.defense();
 
 			if (attacker.isMonster) {
-				att = att + 5 * self.gameLevel();
+				att = att + 2 * self.gameLevel();
 			}
 
 			if (defender.isMonster) {
-				def = def + 5 * self.gameLevel();
+				def = def + 2 * self.gameLevel();
 			}
 			var dmg = window.utils.calculateHit(att, def, attackerRoll);
 
