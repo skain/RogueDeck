@@ -318,7 +318,7 @@
 			var curWeapon = self.weapon();
 			self.weapon(lootCard);
 			if (curWeapon) {
-				self.lootCards.push(curWeapon);
+				self.lootCards.unshift(curWeapon);
 			}
 		};
 
@@ -326,7 +326,7 @@
 			var curArmor = self.armor();
 			self.armor(lootCard);
 			if (curArmor) {
-				self.lootCards.push(curArmor);
+				self.lootCards.unshift(curArmor);
 			}
 		};
 
@@ -484,7 +484,7 @@
 
 		self.takeItem = function (lootCard) {
 			self.addMessageToLog('You took the ' + lootCard.type);
-			self.player().lootCards.push(lootCard);
+			self.player().lootCards.unshift(lootCard);
 			self.currentAreaCard().loot.remove(lootCard);
 			processMonsterTurns();
 		};
