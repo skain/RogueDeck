@@ -19,28 +19,38 @@
 		</div>
 		<div class="row" data-bind="with: currentAreaCard">
 			<div class="col-sm-4" id="AreaDiv">
-				<h3>Area (Steps: <span data-bind="text: window.rogueGame.stepsTaken"></span>/Level: <span data-bind="text: window.rogueGame.gameLevel"></span>)</h3>
-				<div>
-					<h4>You are in a <span data-bind="text: sizeText"></span> <span data-bind="text: type"></span></h4>
-					<ul class="doorsList" data-bind="foreach: doors, css: { disabled: monsters().length > 0 }">
-						<li>There is a door to the <a href="javascript:void(0);" data-bind="text: direction, click:window.rogueGame.tryMoveToNewArea"></a></li>
-					</ul>
+				<h3>Area</h3>
+				<div class="card">
+					<h4>Steps: <span data-bind="text: window.rogueGame.stepsTaken"></span>/Level: <span data-bind="text: window.rogueGame.gameLevel"></span></h4>
+					<div>
+						<h4>You are in a <span data-bind="text: sizeText"></span> <span data-bind="text: type"></span></h4>
+						<ul class="doorsList" data-bind="foreach: doors, css: { disabled: monsters().length > 0 }">
+							<li>There is a door to the <a href="javascript:void(0);" data-bind="text: direction, click:window.rogueGame.tryMoveToNewArea"></a></li>
+						</ul>
+					</div>
 				</div>
 			</div>
 			<div class="col-sm-4" id="MonstersDiv">
 				<h3>Monsters</h3>
 				<div class="row">
 					<!-- ko foreach: monsters -->
-					<div class="col-sm-4">
-						<h4 data-bind="text:type"></h4>
-						<div>
-							Att: <span data-bind="text: attack"></span>, Def: <span data-bind="text:defense"></span>
-						</div>
-						<div>
-							HP: <span data-bind="text: hitPoints"></span>
-						</div>
-						<div>
-							<a href="javascript:void(0);" data-bind="click: window.rogueGame.processPlayerAttack">Attack!</a>
+					<div class="col-sm-12 card">
+						<div class="row">
+							<div class="col-sm-6">
+								<h4><span data-bind="text:type"></span></h4>
+								<div>
+									Att: <span data-bind="text: attack"></span>, Def: <span data-bind="text:defense"></span>
+								</div>
+								<div>
+									HP: <span data-bind="text: hitPoints"></span>
+								</div>
+								<div>
+									<a href="javascript:void(0);" data-bind="click: window.rogueGame.processPlayerAttack">Attack!</a>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<img class="itemImg" data-bind="attr: { src: imageUrl }" />
+							</div>
 						</div>
 					</div>
 					<!-- /ko -->
@@ -61,35 +71,33 @@
 			</div>
 		</div>
 		<div class="row" data-bind="with:player">
-			<h3>Player: <span data-bind="text: name"></span></h3>
 			<div class="col-sm-4">
-				<div class="row">
-					<div class="col-sm-6">
-						<h3>Stats</h3>
-						<table>
-							<tr>
-								<th>Strength</th>
-								<td data-bind="text: strength"></td>
-							</tr>
-							<tr>
-								<th>Intelligence</th>
-								<td data-bind="text: intelligence"></td>
-							</tr>
-							<tr>
-								<th>Dexterity</th>
-								<td data-bind="text: dexterity"></td>
-							</tr>
-							<tr>
-								<th>Vitality</th>
-								<td data-bind="text: vitality"></td>
-							</tr>
-						</table>
-						<div data-bind="visible: rogueGame.curTurnIndex() < 2">
-							<input type="button" value="Re-roll" data-bind="click: rogueGame.rerollCharacter" />
-						</div>
+				<h3>Player: <span data-bind="text: name"></span></h3>
+				<div class="card">
+					<h4>Stats</h4>
+					<table>
+						<tr>
+							<th>Strength</th>
+							<td data-bind="text: strength"></td>
+						</tr>
+						<tr>
+							<th>Intelligence</th>
+							<td data-bind="text: intelligence"></td>
+						</tr>
+						<tr>
+							<th>Dexterity</th>
+							<td data-bind="text: dexterity"></td>
+						</tr>
+						<tr>
+							<th>Vitality</th>
+							<td data-bind="text: vitality"></td>
+						</tr>
+					</table>
+					<div data-bind="visible: rogueGame.curTurnIndex() < 2">
+						<input type="button" value="Re-roll" data-bind="click: rogueGame.rerollCharacter" />
 					</div>
-					<div class="col-sm-6" data-bind="css: { statusAlert: hitPoints() < 12 || stomach() < 12 }">
-						<h3>Vitals</h3>
+					<div data-bind="css: { statusAlert: hitPoints() < 12 || stomach() < 12 }">
+						<h4>Vitals</h4>
 						<table>
 							<tr data-bind="css: { statusAlert: hitPoints() < 12 }">
 								<th>Hit Points</th>
@@ -165,7 +173,7 @@
 	</script>
 
 	<script type="text/html" id="LootCardTemplate">
-		<div class="col-sm-12 lootCard">
+		<div class="col-sm-12 card">
 			<div class="row">
 				<div class="col-sm-6">
 					<h4><span data-bind="text:type"></span><span class="badgesSpan" data-bind="if: value && value.buffs"><span data-bind="template: { name: 'BuffsBadgesTemplate', foreach: value.buffs }"></span></span></h4>

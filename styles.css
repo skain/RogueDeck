@@ -66,29 +66,24 @@ div#MessageLogDiv {
 		z-index: 5;
 	}
 
-	ul.lootList {
-		list-style-type: none;
-		margin: 0;
-		padding: 0;
-	}
+div.card {
+	padding: 10px;
+	border: solid 1px Gray;
+	border-radius: 4px;
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+
+ul.lootList {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
 
 	ul.lootList li div.lootCard h4 {
 		margin: 0;
 	}
 
-	ul.lootList li div.lootCard {
-		padding: 10px;
-		border: solid 1px Gray;
-		border-radius: 4px;
-		margin-top: 5px;
-		margin-bottom: 5px;
-	}
-
-	div.lootCardVerbs {
-		text-align: right;
-	}
-
-	/*ul.lootList div.verbLinkContainer {
-		text-align: right;
-		padding-right: 2px;
-	}*/
+div.lootCardVerbs {
+	text-align: right;
+}

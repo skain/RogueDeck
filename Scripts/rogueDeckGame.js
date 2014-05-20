@@ -3,43 +3,38 @@
 	var rogueDeckManager = function (factories) {
 		var self = {};
 
-		self.createRandomMonsterCard = function () {
-			var attack = window.utils.getRandomNumberBetween(5, 15);
-			var defense = window.utils.getRandomNumberBetween(5, 15);
-			var hitPoints = window.utils.getRandomNumberBetween(3, 15);
 
-			return monsterCard('Monster', 'Monster!', attack, defense, hitPoints);
-		}
+		self.getFirstRoomCard = function () {
+			return areaCard(null, null, 'room', 4);
+		};
 
-		self.createRandomAreaCard = function (isFirstCard) {
+		self.createRandomAreaCard = function (curGameLevel) {
 			var cardSizeInt = window.utils.getRandomNumber(10);
-			//var cardDoors = self.utils.doorUtils.getDoors(Math.floor(cardSizeInt / 2));
 			var cardType = 'room';
-			if (!isFirstCard) {
-				if (window.utils.getRandomNumber(10) < 7) {
-					cardType = 'hallway';
-				}
+			if (window.utils.getRandomNumber(10) < 7) {
+				cardType = 'hallway';
+			}
 
-				//calculate random loot
-				var cardLoot = [];
-				if (cardType == 'room') {
-					var numLoot = Math.floor(cardSizeInt / 2);
-					for (var i = 0; i < numLoot; i++) {
-						var lc = factories.lootFactory.getRandomLootCard();
-						if (lc) {
-							cardLoot.push(lc);
-						}
+			//calculate random loot
+			var cardLoot = [];
+			if (cardType == 'room') {
+				var numLoot = Math.floor(cardSizeInt / 2);
+				for (var i = 0; i < numLoot; i++) {
+					var lc = factories.lootFactory.getRandomLootCard();
+					if (lc) {
+						cardLoot.push(lc);
 					}
 				}
+			}
 
-				var cardMonsters = [];
-				//calculate random monsters
-				var numMonsters = Math.floor(cardSizeInt / 3); //allow for no monsters
-				for (var i = 0; i < numMonsters; i++) {
-					var mc = self.createRandomMonsterCard();
-					if (mc) {
-						cardMonsters.push(mc);
-					}
+			var cardMonsters = [];
+			//calculate random monsters
+			var numMonsters = Math.floor(cardSizeInt / 3); //allow for no monsters
+			for (var i = 0; i < numMonsters; i++) {
+				//var mc = self.createRandomMonsterCard();
+				var mc = factories.monsterFactory.getRandomTier1Monster();
+				if (mc) {
+					cardMonsters.push(mc);
 				}
 			}
 
@@ -48,6 +43,39 @@
 
 		return self;
 	};
+
+	var cardWithImage = function () {
+		var self = {};
+		self.imageUrl = ko.observable();
+		self.setImageUrl = function (searchStr) {
+			searchStr = searchStr.replace(' ', '+');
+			var imageSearch = null;
+			function callback() {
+				// Check that we got results
+				if (imageSearch.results && imageSearch.results.length > 0) {
+					var index = window.utils.getRandomNumberBetween(0, imageSearch.results.length - 1);
+					self.imageUrl(imageSearch.results[index].tbUrl);
+				}
+			};
+
+			function doImageSearch() {
+				imageSearch = new google.search.ImageSearch();
+
+				imageSearch.setSearchCompleteCallback(this, callback, null);
+
+				imageSearch.execute(searchStr);
+				var page = window.utils.getRandomNumberBetween(0, 100);
+				imageSearch.gotoPage(page);
+
+				// Include the required Google branding
+				google.search.Search.getBranding('GoogleBranding');
+			};
+
+			doImageSearch();
+		}
+
+		return self;
+	}
 
 	var doorCard = function (direction) {
 		var self = {};
@@ -70,7 +98,7 @@
 	}
 
 	var lootCard = function (type, verb, value) {
-		var self = {};
+		var self = cardWithImage();
 		self.type = type;
 		self.verb = verb;
 		self.value = value;
@@ -90,47 +118,19 @@
 
 			return null;
 		});
-		var setImageUrl = function () {
-			var imageSearch = null;
-			function callback() {
-				// Check that we got results
-				if (imageSearch.results && imageSearch.results.length > 0) {
-					var index = window.utils.getRandomNumberBetween(0, imageSearch.results.length - 1);
-					self.imageUrl(imageSearch.results[index].tbUrl);
-				}
-			};
-
-			function doImageSearch() {
-				imageSearch = new google.search.ImageSearch();
-
-				imageSearch.setSearchCompleteCallback(this, callback, null);
-
-				imageSearch.execute(self.displayName());
-				var page = window.utils.getRandomNumberBetween(0, 100);
-				imageSearch.gotoPage(page);
-				//console.log(page);
-
-				// Include the required Google branding
-				google.search.Search.getBranding('GoogleBranding');
-			};
-
-			doImageSearch();
-		};
-
-		setImageUrl();
-
+		self.setImageUrl(self.displayName());
 		return self;
 	}
 
 	var monsterCard = function (type, name, attack, defense, hitPoints) {
-		var self = {};
+		var self = cardWithImage();
 		self.type = type || "Monster";
 		self.name = ko.observable(name);
 		self.attack = ko.observable(attack || 1);
 		self.defense = ko.observable(defense || 1);
 		self.hitPoints = ko.observable(hitPoints || 1);
 		self.isMonster = true;
-
+		self.setImageUrl(self.name());
 		return self;
 	}
 
@@ -410,7 +410,7 @@
 			self.player(player);
 			self.curTurnIndex(0);
 			self.stepsTaken(0);
-			self.currentAreaCard(rogueDeck.createRandomAreaCard(true));
+			self.currentAreaCard(rogueDeck.getFirstRoomCard());
 		};
 
 		var processAttack = function (attacker, defender) {
@@ -464,7 +464,7 @@
 		self.moveToNextArea = function (direction) {
 			if (self.currentAreaCard().directionExists(direction)) {
 				processTurnCompletion();
-				self.currentAreaCard(rogueDeck.createRandomAreaCard(false));
+				self.currentAreaCard(rogueDeck.createRandomAreaCard(self.gameLevel));
 				self.addMessageToLog('You moved ' + direction);
 				self.stepsTaken(self.stepsTaken() + 1);
 				if (self.currentAreaCard().monsters().length > 0) {
@@ -543,7 +543,7 @@
 			window.rogueGame.startGameAndGetFirstRoom();
 		}
 
-		
+
 
 		return self;
 	}
@@ -630,7 +630,6 @@
 		};
 		return self
 	})();
-
 	factories.buffFactory = (function () {
 		var self = {};
 
@@ -747,6 +746,45 @@
 
 		return self;
 	})(factories);
+	factories.monsterFactory = (function () {
+		var self = {};
+		function getMonsterFromItem(item) {
+			var attack = item.modifier + window.utils.getRandomNumber(6);
+			var defense = item.modifier + window.utils.getRandomNumber(6);
+			var hp = item.modifier + window.utils.getRandomNumber(6);
+
+			var m = monsterCard(item.name, item.name, attack, defense, hp);
+
+			return m;
+		}
+
+		self.getRandomTier1Monster = function () {
+			var item = rogueDeckDictionary.monsterTypes.getTier1MonsterType();
+			return getMonsterFromItem(item);
+		};
+
+		self.getRandomTier2Monster = function () {
+			var item = rogueDeckDictionary.monsterTypes.getTier2MonsterType();
+			return getMonsterFromItem(item);
+		};
+
+		self.getRandomTier3Monster = function () {
+			var item = rogueDeckDictionary.monsterTypes.getTier3MonsterType();
+			return getMonsterFromItem(item);
+		};
+
+		self.getRandomTier4Monster = function () {
+			var item = rogueDeckDictionary.monsterTypes.getTier4MonsterType();
+			return getMonsterFromItem(item);
+		};
+
+		self.getRandomTier5Monster = function () {
+			var item = rogueDeckDictionary.monsterTypes.getTier5MonsterType();
+			return getMonsterFromItem(item);
+		};
+
+		return self;
+	})();
 
 	window.rogueGame = rogueGame();
 })(window);
