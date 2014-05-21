@@ -32,7 +32,29 @@
 			var numMonsters = Math.floor(cardSizeInt / 3); //allow for no monsters
 			for (var i = 0; i < numMonsters; i++) {
 				//var mc = self.createRandomMonsterCard();
-				var mc = factories.monsterFactory.getRandomTier1Monster();
+				var mc = null;
+				var roll = window.utils.getWeightedRandomNumber(1, 5);
+				switch (roll)
+				{
+					case 1:
+						mc = factories.monsterFactory.getRandomTier1Monster();
+						break;
+					case 2:
+						mc = factories.monsterFactory.getRandomTier2Monster();
+						break;
+					case 3:
+						mc = factories.monsterFactory.getRandomTier3Monster();
+						break;
+					case 4:
+						mc = factories.monsterFactory.getRandomTier4Monster();
+						break;
+					case 5:
+						mc = factories.monsterFactory.getRandomTier5Monster();
+						break;
+					default:
+						throw 'Expected # between 1 and 5, got: ' + roll;
+				}
+
 				if (mc) {
 					cardMonsters.push(mc);
 				}
