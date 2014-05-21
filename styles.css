@@ -3,8 +3,7 @@
 	position: absolute;
 	height: 100%;
 	width: 100%;
-	background-color: Red;
-	opacity: .2;
+	background-color: rgba(255,0,0,.2);
 	content: ' ';
 	top: 0px;
 	left: 0px;
