@@ -398,12 +398,12 @@
 		var getStartingArmor = function () {
 			var armor = factories.armorFactory.getRandomTier1Armor();
 			return lootCard(armor.displayName(), 'equip', armor);
-		}
+		};
 
 		var getStartingWeapon = function () {
 			var weapon = factories.weaponFactory.getRandomTier1Weapon();
 			return lootCard(weapon.displayName(), 'equip', weapon);
-		}
+		};
 
 
 		self.addMessageToLog = function (msg, level) {
@@ -413,7 +413,7 @@
 			if (self.messageLog().length == 7) {
 				self.messageLog.pop();
 			}
-		}
+		};
 
 		self.clearMessageLog = function () {
 			self.messageLog.removeAll();
@@ -455,7 +455,7 @@
 				//process miss
 				self.addMessageToLog(attacker.name() + ' misses ' + defender.name(), attacker.isPlayer ? 'warning' : 'success');
 			}
-		}
+		};
 
 		var processMonsterTurns = function () {
 			var gameOver = false;
@@ -468,7 +468,7 @@
 				}
 			}
 			return gameOver;
-		}
+		};
 		var processTurnCompletion = function () {
 			processMonsterTurns();
 			self.player().stomach(self.player().stomach() - 1);
@@ -479,7 +479,7 @@
 					processEndGame();
 				}
 			}
-		}
+		};
 
 		self.moveToNextArea = function (direction) {
 			if (self.currentAreaCard().directionExists(direction)) {
@@ -494,7 +494,7 @@
 			} else {
 				return false;
 			}
-		}
+		};
 
 		self.tryMoveToNewArea = function (door) {
 			if (!self.moveToNextArea(door.direction)) {
@@ -519,7 +519,7 @@
 			self.addMessageToLog('You dropped the ' + lootCard.type);
 			self.player().lootCards.remove(lootCard);
 			self.currentAreaCard().loot.push(lootCard);
-		}
+		};
 
 		var processEndGame = function () {
 			var gameOver = false;
@@ -560,9 +560,27 @@
 		self.startNewGame = function () {
 			self.hideAlertDiv();
 			window.rogueGame.startGameAndGetFirstRoom();
-		}
+		};
 
+		self.runFromArea = function () {
+			self.addMessageToLog('You attempt to run from the area!', 'warning');
+			var gameOver = false;
+			for (var i = 0; i < self.currentAreaCard().monsters().length; i++) {
+				var monster = self.currentAreaCard().monsters()[i];
+				var roll = window.utils.getRandomNumber(10);
+				if (roll < 5) {
+					processAttack(monster, self.player());
+					if (processEndGame()) {
+						gameOver = true;
+						break;
+					}
+				}
+			}
 
+			if (!gameOver) {
+				self.moveToNextArea(self.currentAreaCard().doors()[0].direction);
+			}
+		};
 
 		return self;
 	}

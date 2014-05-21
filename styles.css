@@ -11,6 +11,41 @@
 	z-index: 99;
 }
 
+#MonsterBlockDiv {
+	display: block;
+	position: absolute;
+	height: 100%;
+	width: 100%;
+	background-color: rgba(255,0,0,.2);
+	top: 0px;
+	left: 0px;
+	z-index: 99;
+	text-align: center;
+}
+
+	#MonsterBlockDiv div.monsterAlert {
+		color: red;
+		-webkit-transform: rotate(-45deg);
+		font-size: 2.0em;
+		font-weight: bold;
+		width: 201px;
+		height: 40px;
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		margin-left: -100px;
+		margin-top: -20px;
+	}
+
+	#MonsterBlockDiv div.runDiv {
+		position: absolute;
+		bottom: -10px;
+		width: 50px;
+		left: 50%;
+		margin-left: -25px;
+		z-index: 100;
+	}
+
 div#MessageLogDiv {
 	margin-top: 20px;
 }
@@ -88,5 +123,9 @@ ul.lootList {
 	}
 
 div.lootCardVerbs {
+	text-align: right;
+}
+
+div.cardImgDiv {
 	text-align: right;
 }
