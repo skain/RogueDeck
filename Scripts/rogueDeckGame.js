@@ -415,7 +415,7 @@
 			$.growl(msg, {
 				type: level,
 				template: {
-					container: '<div class="col-md-2 alert">'
+					container: '<div class="col-md-2 alert growl-animated">'
 				},
 				position: {
 					from: "top",
