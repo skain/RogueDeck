@@ -58,6 +58,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="RogueDeck.htm" />
+    <Content Include="Scripts\bootstrap-growl.min.js" />
     <Content Include="Scripts\rogueDeckDictionary.js" />
     <Content Include="Scripts\rogueDeckGame.js" />
     <Content Include="Scripts\utils.js" />

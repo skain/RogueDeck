@@ -68,7 +68,6 @@ div#MessageLogDiv {
 	text-align: center;
 	display: none;
 	border: solid 2px red;
-	opacity: .8;
 }
 
 #AlertMsg {
@@ -96,6 +95,7 @@ div#MessageLogDiv {
 		-webkit-transform: scale(2.0);
 		-moz-transform: scale(2.0);
 		transform: scale(2.0);
+		z-index: 10;
 	}
 
 #MonstersDiv .itemImg {
@@ -127,4 +127,12 @@ div.lootCardVerbs {
 
 div.cardImgDiv {
 	text-align: right;
+}
+
+.alert {
+  -webkit-transition: all 0.5s ease-in-out;
+  -moz-transition: all 0.5s ease-in-out;
+  -o-transition: all 0.5s ease-in-out;
+  -ms-transition: all 0.5s ease-in-out;
+  transition: all 0.5s ease-in-out;
 }

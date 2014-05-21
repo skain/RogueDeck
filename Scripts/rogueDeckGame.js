@@ -34,8 +34,7 @@
 				//var mc = self.createRandomMonsterCard();
 				var mc = null;
 				var roll = window.utils.getWeightedRandomNumber(1, 5);
-				switch (roll)
-				{
+				switch (roll) {
 					case 1:
 						mc = factories.monsterFactory.getRandomTier1Monster();
 						break;
@@ -409,10 +408,22 @@
 		self.addMessageToLog = function (msg, level) {
 			level = level || 'info';
 
-			self.messageLog.unshift({ message: msg, level: level });
-			if (self.messageLog().length == 7) {
-				self.messageLog.pop();
-			}
+			//self.messageLog.unshift({ message: msg, level: level });
+			//if (self.messageLog().length == 7) {
+			//	self.messageLog.pop();
+			//}
+			$.growl(msg, {
+				type: level,
+				//template: {
+				//	container: '<div class="col-md-3 growl-animated alert">'
+				//},
+				position: {
+					from: "top",
+					align: "right"
+				},
+				fade_in: 800,
+				delay: 5000
+			})
 		};
 
 		self.clearMessageLog = function () {
