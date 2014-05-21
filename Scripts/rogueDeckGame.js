@@ -414,15 +414,16 @@
 			//}
 			$.growl(msg, {
 				type: level,
-				//template: {
-				//	container: '<div class="col-md-3 growl-animated alert">'
-				//},
+				template: {
+					container: '<div class="col-md-2 alert">'
+				},
 				position: {
 					from: "top",
 					align: "right"
 				},
 				fade_in: 800,
-				delay: 5000
+				pause_on_mouseover: true,
+				delay: 3000
 			})
 		};
 
