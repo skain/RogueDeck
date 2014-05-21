@@ -3,14 +3,12 @@
 	position: absolute;
 	height: 100%;
 	width: 100%;
-	background-color: Black;
+	background-color: Red;
 	opacity: .2;
 	content: ' ';
 	top: 0px;
 	left: 0px;
 	z-index: 99;
-}
-
 }
 
 div#MessageLogDiv {
@@ -56,15 +54,19 @@ div#MessageLogDiv {
 	transition: 0.5s ease;
 	-webkit-transition: 0.5s ease;
 	-moz-transition: 0.5s ease;
-	z-index: 1;
+	box-shadow: rgba(0,0,0,0.5) 0px 0px 9px;
+	border-radius: 6px;
 }
 
 	.itemImg:hover {
 		-webkit-transform: scale(2.0);
 		-moz-transform: scale(2.0);
 		transform: scale(2.0);
-		z-index: 5;
 	}
+
+#MonstersDiv .itemImg {
+	max-height: 99px;
+}
 
 div.card {
 	padding: 10px;
@@ -72,6 +74,7 @@ div.card {
 	border-radius: 4px;
 	margin-top: 5px;
 	margin-bottom: 5px;
+	position: relative;
 }
 
 ul.lootList {

@@ -34,22 +34,24 @@
 				<h3>Monsters</h3>
 				<div class="row">
 					<!-- ko foreach: monsters -->
-					<div class="col-sm-12 card">
-						<div class="row">
-							<div class="col-sm-6">
-								<h4><span data-bind="text:type"></span></h4>
-								<div>
-									Att: <span data-bind="text: attack"></span>, Def: <span data-bind="text:defense"></span>
+					<div class="col-sm-12">
+						<div class="card">
+							<div class="row">
+								<div class="col-sm-6">
+									<h4><span data-bind="text:type"></span></h4>
+									<div>
+										Att: <span data-bind="text: attack"></span>, Def: <span data-bind="text:defense"></span>
+									</div>
+									<div>
+										HP: <span data-bind="text: hitPoints"></span>
+									</div>
+									<div>
+										<a href="javascript:void(0);" data-bind="click: window.rogueGame.processPlayerAttack">Attack!</a>
+									</div>
 								</div>
-								<div>
-									HP: <span data-bind="text: hitPoints"></span>
+								<div class="col-sm-6">
+									<img class="itemImg" data-bind="attr: { src: imageUrl }" />
 								</div>
-								<div>
-									<a href="javascript:void(0);" data-bind="click: window.rogueGame.processPlayerAttack">Attack!</a>
-								</div>
-							</div>
-							<div class="col-sm-6">
-								<img class="itemImg" data-bind="attr: { src: imageUrl }" />
 							</div>
 						</div>
 					</div>
@@ -93,7 +95,7 @@
 							<td data-bind="text: vitality"></td>
 						</tr>
 					</table>
-					<div data-bind="visible: rogueGame.curTurnIndex() < 2">
+					<div data-bind="visible: rogueGame.stepsTaken() < 2">
 						<input type="button" value="Re-roll" data-bind="click: rogueGame.rerollCharacter" />
 					</div>
 					<div data-bind="css: { statusAlert: hitPoints() < 12 || stomach() < 12 }">
@@ -173,16 +175,18 @@
 	</script>
 
 	<script type="text/html" id="LootCardTemplate">
-		<div class="col-sm-12 card">
-			<div class="row">
-				<div class="col-sm-6">
-					<h4><span data-bind="text:type"></span><span class="badgesSpan" data-bind="if: value && value.buffs"><span data-bind="template: { name: 'BuffsBadgesTemplate', foreach: value.buffs }"></span></span></h4>
-					<div data-bind="if: description">
-						<span data-bind="text: description"></span>
+		<div class="col-sm-12">
+			<div class="card">
+				<div class="row">
+					<div class="col-sm-6">
+						<h4><span data-bind="text:type"></span><span class="badgesSpan" data-bind="if: value && value.buffs"><span data-bind="template: { name: 'BuffsBadgesTemplate', foreach: value.buffs }"></span></span></h4>
+						<div data-bind="if: description">
+							<span data-bind="text: description"></span>
+						</div>
 					</div>
-				</div>
-				<div class="col-sm-6">
-					<img class="itemImg" data-bind="attr: { src: imageUrl }" />
+					<div class="col-sm-6">
+						<img class="itemImg" data-bind="attr: { src: imageUrl }" />
+					</div>
 				</div>
 			</div>
 		</div>

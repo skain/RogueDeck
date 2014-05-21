@@ -366,7 +366,6 @@
 		self.currentAreaCard = ko.observable(null);
 		self.player = ko.observable(null);
 		self.messageLog = ko.observableArray();
-		self.curTurnIndex = ko.observable(0);
 		self.stepsTaken = ko.observable(0);
 		self.gameLevel = ko.computed(function () {
 			return Math.floor(self.stepsTaken() / 10) + 1;
@@ -408,7 +407,6 @@
 			player.equipWeapon(getStartingWeapon());
 			player.equipArmor(getStartingArmor());
 			self.player(player);
-			self.curTurnIndex(0);
 			self.stepsTaken(0);
 			self.currentAreaCard(rogueDeck.getFirstRoomCard());
 		};
@@ -539,7 +537,6 @@
 
 		self.startNewGame = function () {
 			self.hideAlertDiv();
-			self.curTurnIndex(0);
 			window.rogueGame.startGameAndGetFirstRoom();
 		}
 
