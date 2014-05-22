@@ -33,7 +33,12 @@
 			for (var i = 0; i < numMonsters; i++) {
 				//var mc = self.createRandomMonsterCard();
 				var mc = null;
-				var roll = window.utils.getWeightedRandomNumber(1, 5);
+				//var roll = window.utils.getWeightedRandomNumber(1, 5);
+				var median = Math.floor(curGameLevel / 5);
+				if (median > 5) {
+					median = 5;
+				}
+				var roll = window.utils.getDownwardWeightedRandomNumber(1, 5, median);
 				switch (roll) {
 					case 1:
 						mc = factories.monsterFactory.getRandomTier1Monster();
@@ -276,12 +281,10 @@
 		self.lootCards = ko.observableArray();
 		self.defense = ko.computed(function () {
 			var def = self.dexterity() + (self.armor && self.armor() ? self.armor().value.totalDefense() : 0);
-			console.log("Def:" + def);
 			return def;
 		});
 		self.attack = ko.computed(function () {
 			var att = self.strength() + (self.weapon && self.weapon() ? self.weapon().value.totalToHit() : 0);
-			console.log("Att:" + att);
 			return att;
 		});
 		self.isPlayer = true;
@@ -496,7 +499,7 @@
 		self.moveToNextArea = function (direction) {
 			if (self.currentAreaCard().directionExists(direction)) {
 				processTurnCompletion();
-				self.currentAreaCard(rogueDeck.createRandomAreaCard(self.gameLevel));
+				self.currentAreaCard(rogueDeck.createRandomAreaCard(self.gameLevel()));
 				self.addMessageToLog('You moved ' + direction);
 				self.stepsTaken(self.stepsTaken() + 1);
 				if (self.currentAreaCard().monsters().length > 0) {
