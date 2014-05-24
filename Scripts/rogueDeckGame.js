@@ -31,41 +31,7 @@
 				//calculate random monsters
 				var numMonsters = Math.floor(cardSizeInt / 3); //allow for no monsters
 				for (var i = 0; i < numMonsters; i++) {
-					var mc = null;
-					var median = Math.floor(curGameLevel / 5);
-					if (median > 5) {
-						median = 5;
-					}
-					var min = 1, max = 5;
-
-					if (median - 2 > min) {
-						min = median - 2;
-					}
-
-					if (median + 2 < max) {
-						max = median + 2;
-					}
-
-					var roll = window.utils.getDownwardWeightedRandomNumber(min, max, median);
-					switch (roll) {
-						case 1:
-							mc = deck.monsterCards.getRandomTier1Monster();
-							break;
-						case 2:
-							mc = deck.monsterCards.getRandomTier2Monster();
-							break;
-						case 3:
-							mc = deck.monsterCards.getRandomTier3Monster();
-							break;
-						case 4:
-							mc = deck.monsterCards.getRandomTier4Monster();
-							break;
-						case 5:
-							mc = deck.monsterCards.getRandomTier5Monster();
-							break;
-						default:
-							throw 'Expected # between 1 and 5, got: ' + roll;
-					}
+					var mc = deck.monsterCards.getRandomMonsterForLevel(curGameLevel);
 
 					if (mc) {
 						cardMonsters.push(mc);
@@ -76,6 +42,23 @@
 			};
 		})(self);
 
+		self.calculateForCurLevel = function (curGameLevel) {
+			var median = Math.floor(curGameLevel / 5);
+			if (median > 5) {
+				median = 5;
+			}
+			var min = 1, max = 5;
+
+			if (median - 2 > min) {
+				min = median - 2;
+			}
+
+			if (median + 2 < max) {
+				max = median + 2;
+			}
+
+			return { min: min, max: max, median: median };
+		};
 		self.weaponCards = (function (deck) {
 			var self = {};
 
@@ -311,6 +294,36 @@
 			self.getRandomTier5Monster = function () {
 				var item = rogueDeckDictionary.monsterTypes.getTier5MonsterType();
 				return getMonsterFromItem(item);
+			};
+
+			self.getRandomMonsterForLevel = function (curGameLevel) {
+				var mc = null;
+				
+				var levelValues = deck.calculateForCurLevel(curGameLevel);
+
+
+				var roll = window.utils.getDownwardWeightedRandomNumber(levelValues.min, levelValues.max, levelValues.median);
+				switch (roll) {
+					case 1:
+						mc = deck.monsterCards.getRandomTier1Monster();
+						break;
+					case 2:
+						mc = deck.monsterCards.getRandomTier2Monster();
+						break;
+					case 3:
+						mc = deck.monsterCards.getRandomTier3Monster();
+						break;
+					case 4:
+						mc = deck.monsterCards.getRandomTier4Monster();
+						break;
+					case 5:
+						mc = deck.monsterCards.getRandomTier5Monster();
+						break;
+					default:
+						throw 'Expected # between 1 and 5, got: ' + roll;
+				}
+
+				return mc;
 			};
 
 			return self;
