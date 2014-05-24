@@ -256,6 +256,100 @@
 				return lootCard(item.displayName(), verb, item);
 			};
 
+			self.getRandomLootForLevel = function (curGameLevel) {
+
+				var type, verb, value, lc;
+				var rnd = window.utils.getWeightedRandomNumber(1, 10);
+				switch (rnd) {
+					case 1:
+						//other thing
+						lc = lootCard('useless thing', 'discard', null);
+						break;
+					case 2:
+					case 3:
+						//food
+						lc = lootCard('food', 'eat', 10);
+						break;
+					case 4:
+						//health
+						type = 'health potion';
+						verb = 'use'
+						var size = window.utils.getWeightedRandomNumber(1, 3);
+						switch (size) {
+							case 1:
+								type = 'small ' + type;
+								value = 10;
+								break;
+							case 2:
+								type = 'medium ' + type;
+								value = 20;
+								break;
+							case 3:
+								type = 'large ' + type;
+								value = 30;
+								break;
+						}
+						lc = lootCard(type, verb, value);
+						break;
+					case 5:
+					case 6:
+					case 7:
+					case 8:
+					case 9:
+					case 10:
+						//weapon or armor
+						var levelValues = deck.calculateForCurLevel(curGameLevel);
+						var itemRoll = window.utils.getDownwardWeightedRandomNumber(levelValues.min, levelValues.max, levelValues.median);
+						var rnd = window.utils.getRandomNumberBetween(1, 2);
+						if (rnd == 1) {
+							//weapon
+							var weapon = null;
+							switch (itemRoll) {
+								case 1:
+									weapon = deck.weaponCards.getRandomTier1Weapon();
+									break;
+								case 2:
+									weapon = deck.weaponCards.getRandomTier2Weapon();
+									break;
+								case 3:
+									weapon = deck.weaponCards.getRandomTier3Weapon();
+									break;
+								case 4:
+									weapon = deck.weaponCards.getRandomTier4Weapon();
+									break;
+								case 5:
+									weapon = deck.weaponCards.getRandomTier5Weapon();
+									break;
+							}
+							lc = self.createFromItem(weapon, 'equip');
+						} else {
+							//armor
+							var armor = null;
+							switch (itemRoll) {
+								case 1:
+									armor = deck.armorCards.getRandomTier1Armor();
+									break;
+								case 2:
+									armor = deck.armorCards.getRandomTier2Armor();
+									break;
+								case 3:
+									armor = deck.armorCards.getRandomTier3Armor();
+									break;
+								case 4:
+									armor = deck.armorCards.getRandomTier4Armor();
+									break;
+								case 5:
+									armor = deck.armorCards.getRandomTier5Armor();
+									break;
+							}
+							lc = self.createFromItem(armor, 'equip');
+
+						}
+						break;
+				}
+				return lc;
+			};
+
 			return self;
 		})(self);
 
