@@ -43,7 +43,7 @@
 		})(self);
 
 		self.calculateForCurLevel = function (curGameLevel) {
-			var median = Math.floor(curGameLevel / 5);
+			var median = Math.floor(curGameLevel / 2); 
 			if (median > 5) {
 				median = 5;
 			}
@@ -257,7 +257,6 @@
 			};
 
 			self.getRandomLootForLevel = function (curGameLevel) {
-
 				var type, verb, value, lc;
 				var rnd = window.utils.getWeightedRandomNumber(1, 10);
 				switch (rnd) {
@@ -355,39 +354,39 @@
 
 		self.monsterCards = (function (deck) {
 			var self = {};
-			function getMonsterFromItem(item) {
+			function getMonsterFromItem(item, level) {
 				var attack = item.modifier + window.utils.getRandomNumber(6);
 				var defense = item.modifier + window.utils.getRandomNumber(6);
 				var hp = item.modifier + window.utils.getRandomNumber(6);
 
-				var m = monsterCard(item.name, item.name, attack, defense, hp);
+				var m = monsterCard(item.name, level, item.name, attack, defense, hp);
 
 				return m;
 			}
 
 			self.getRandomTier1Monster = function () {
 				var item = rogueDeckDictionary.monsterTypes.getTier1MonsterType();
-				return getMonsterFromItem(item);
+				return getMonsterFromItem(item, 1);
 			};
 
 			self.getRandomTier2Monster = function () {
 				var item = rogueDeckDictionary.monsterTypes.getTier2MonsterType();
-				return getMonsterFromItem(item);
+				return getMonsterFromItem(item, 2);
 			};
 
 			self.getRandomTier3Monster = function () {
 				var item = rogueDeckDictionary.monsterTypes.getTier3MonsterType();
-				return getMonsterFromItem(item);
+				return getMonsterFromItem(item, 3);
 			};
 
 			self.getRandomTier4Monster = function () {
 				var item = rogueDeckDictionary.monsterTypes.getTier4MonsterType();
-				return getMonsterFromItem(item);
+				return getMonsterFromItem(item, 4);
 			};
 
 			self.getRandomTier5Monster = function () {
 				var item = rogueDeckDictionary.monsterTypes.getTier5MonsterType();
-				return getMonsterFromItem(item);
+				return getMonsterFromItem(item, 5);
 			};
 
 			self.getRandomMonsterForLevel = function (curGameLevel) {
@@ -503,7 +502,7 @@
 		return self;
 	}
 
-	var monsterCard = function (type, name, attack, defense, hitPoints) {
+	var monsterCard = function (type, level, name, attack, defense, hitPoints) {
 		var self = cardWithImage();
 		self.type = type || "Monster";
 		self.name = ko.observable(name);
@@ -512,6 +511,7 @@
 		self.hitPoints = ko.observable(hitPoints || 1);
 		self.isMonster = true;
 		self.setImageUrl(self.name());
+		self.level = level;
 		return self;
 	}
 
@@ -809,11 +809,11 @@
 			var def = defender.defense();
 
 			if (attacker.isMonster) {
-				att = att + 2 * self.gameLevel();
+				att = att + 2 * attacker.level;
 			}
 
 			if (defender.isMonster) {
-				def = def + 2 * self.gameLevel();
+				def = def + 2 * defender.level;
 			}
 			var dmg = window.utils.calculateHit(att, def, attackerRoll);
 
