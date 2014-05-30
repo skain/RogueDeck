@@ -62,11 +62,10 @@
     <Content Include="Scripts\rogueDeckDictionary.js" />
     <Content Include="Scripts\rogueDeckGame.js" />
     <Content Include="Scripts\utils.js" />
+    <None Include="Properties\PublishProfiles\roguedeck - FTP.pubxml" />
+    <None Include="Properties\PublishProfiles\roguedeck - Web Deploy.pubxml" />
     <None Include="Scripts\_references.js" />
     <Content Include="styles.css" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
