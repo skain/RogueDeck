@@ -57,6 +57,7 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="index.htm" />
     <Content Include="RogueDeck.htm" />
     <Content Include="Scripts\bootstrap-growl.min.js" />
     <Content Include="Scripts\rogueDeckDictionary.js" />
