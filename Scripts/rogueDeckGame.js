@@ -430,22 +430,36 @@
 		self.setImageUrl = function (searchStr) {
 			searchStr = searchStr.replace(' ', '+');
 			var imageSearch = null;
+			var pageRandomized = false;
+			var randomPageIndex = 1;
 			function callback() {
+				if (!pageRandomized) {
+					pageRandomized = true;
+					randomPageIndex = window.utils.getRandomNumberBetween(0, imageSearch.cursor.pages.length - 1);
+					imageSearch.gotoPage(randomPageIndex);
+					return;
+				}
 				// Check that we got results
 				if (imageSearch.results && imageSearch.results.length > 0) {
 					var index = window.utils.getRandomNumberBetween(0, imageSearch.results.length - 1);
 					self.imageUrl(imageSearch.results[index].tbUrl);
+				} else {
+					if (randomPageIndex > -1) {
+						randomPageIndex--;
+						console.log(randomPageIndex);
+						imageSearch.gotoPage(randomPageIndex);
+					}
 				}
 			};
 
 			function doImageSearch() {
+				pageRandomized = false;
+				randomPageIndex = 1;
 				imageSearch = new google.search.ImageSearch();
 
 				imageSearch.setSearchCompleteCallback(this, callback, null);
 
 				imageSearch.execute(searchStr);
-				var page = window.utils.getRandomNumberBetween(0, 100);
-				imageSearch.gotoPage(page);
 
 				// Include the required Google branding
 				google.search.Search.getBranding('GoogleBranding');
