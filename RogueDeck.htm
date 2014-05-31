@@ -9,6 +9,16 @@
 	<link rel="stylesheet" type="text/css" href="styles.css" />
 </head>
 <body>
+	<div id="SmallScreenNav">
+		<ul>
+			<li><a href="#AreaDiv">A</a></li>
+			<li><a href="#MonstersDiv">M</a></li>
+			<li><a href="#LootDiv">L</a></li>
+			<li><a href="#PlayerDiv">P</a></li>
+			<li><a href="#InventoryDiv">I</a></li>
+			<li><a href="#EquippedDiv">E</a></li>
+		</ul>
+	</div>
 	<div class="container">
 		<div id="AlertDiv">
 			<div id="AlertMsg"></div>
@@ -77,7 +87,7 @@
 			</div>
 		</div>
 		<div class="row" data-bind="with:player">
-			<div class="col-sm-4">
+			<div class="col-sm-4" id="PlayerDiv">
 				<h3>Player: <span data-bind="text: name"></span></h3>
 				<div class="card">
 					<div class="row">
@@ -123,7 +133,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-sm-4">
+			<div class="col-sm-4" id="InventoryDiv">
 				<h3>Inventory</h3>
 				<ul class="lootList" data-bind="foreach: lootCards">
 					<li>
@@ -135,7 +145,7 @@
 					</li>
 				</ul>
 			</div>
-			<div class="col-sm-4">
+			<div class="col-sm-4" id="EquippedDiv">
 				<h3>Equipped</h3>
 				<ul class="lootList">
 					<li>
