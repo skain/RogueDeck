@@ -1,3 +1,15 @@
+
+@media screen and (min-width: 768px) and (max-width: 10024px) {
+	#SmallScreenNav {
+		display: none;
+	}
+}
+
+
+div.cardImgDiv {
+	text-align: right;
+}
+
 .disabled:after {
 	display: block;
 	position: absolute;
@@ -125,28 +137,13 @@ div.lootCardVerbs {
 	text-align: right;
 }
 
-div.cardImgDiv {
-	text-align: right;
-}
-
-.growl-animated {
-  -webkit-transition: top 0.5s ease-in-out;
-  -moz-transition: top 0.5s ease-in-out;
-  -o-transition: top 0.5s ease-in-out;
-  -ms-transition: top 0.5s ease-in-out;
-  transition: top 0.5s ease-in-out;
-}
-@media screen and (min-width: 768px) and (max-width: 10024px) {
-	#SmallScreenNav {
-		display: none;
-	}
-}
 #SmallScreenNav {
 	position: fixed;
-	bottom: 0px;
-	border: solid 1px black;
+	bottom: -5px;
+	box-shadow: 0px 0px 20px #888888;
+	border-radius: 6px 6px 0px 0px;
 	padding: 10px;
-	background-color: white;
+	background-color: #f0ebc5;
 	z-index: 5;
 	width: 206px;
 	left: 0px;
@@ -154,19 +151,21 @@ div.cardImgDiv {
 	margin: 0 auto;
 }
 
-#SmallScreenNav ul {
-	list-style-type: none;
-	margin: 0;
-	padding: 0;
-}
-
-	#SmallScreenNav ul li {
-		float: left;
-		margin: 0 5px;
-		background-color: lightgray;
-		padding: 2px 6px;
+	#SmallScreenNav ul {
+		list-style-type: none;
+		margin: 0;
+		padding: 0;
 	}
 
-		#SmallScreenNav ul li a {
-			font-weight: bold;
+		#SmallScreenNav ul li {
+			float: left;
+			margin: 0 5px;
 		}
+
+			#SmallScreenNav ul li a {
+				font-weight: bold;
+				display: block;
+				line-height: 20px;
+				padding: 2px 6px;
+				background-color: lightgray;
+			}
