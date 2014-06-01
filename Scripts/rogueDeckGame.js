@@ -20,7 +20,7 @@
 				if (cardType == 'room') {
 					var numLoot = Math.floor(cardSizeInt / 2);
 					for (var i = 0; i < numLoot; i++) {
-						var lc = deck.lootCards.getRandomLootCard();
+						var lc = deck.lootCards.getRandomLootCard(curGameLevel);
 						if (lc) {
 							cardLoot.push(lc);
 						}
@@ -160,15 +160,17 @@
 
 		self.lootCards = (function (deck) {
 			var self = {};
-			self.getRandomLootCard = function () {
+			self.getRandomLootCard = function (gameLevel) {
 				var type, verb, value, lc;
 				var rnd = window.utils.getWeightedRandomNumber(1, 10);
 				switch (rnd) {
 					case 1:
+						lc = null;
+						break;
+					case 2:
 						//other thing
 						lc = lootCard('useless thing', 'discard', null);
 						break;
-					case 2:
 					case 3:
 						//food
 						lc = lootCard('food', 'eat', 10);
@@ -202,7 +204,7 @@
 					case 10:
 						//weapon or armor
 						var rnd = window.utils.getRandomNumberBetween(1, 2);
-						var tier = window.utils.getWeightedRandomNumber(1, 5);
+						var tier = window.utils.getDownwardWeightedRandomNumber(1, 5, gameLevel);
 						if (rnd == 1) {
 							//weapon
 							var weapon = null;
@@ -568,7 +570,7 @@
 		}
 
 		self.addMonsterDrop = function (monster) {
-			var lc = deck.lootCards.getRandomLootCard();
+			var lc = deck.lootCards.getRandomLootCard(monster.level);
 			lc.droppedBy = monster.name() + ' dropped a ';
 			self.loot.push(lc);
 		}
@@ -822,13 +824,14 @@
 			var att = attacker.attack();
 			var def = defender.defense();
 
-			if (attacker.isMonster) {
-				att = att + 2 * attacker.level;
-			}
+			//I don't think I need this anymore since monsters get harder by tier now...
+			//if (attacker.isMonster) {
+			//	att = att + 2 * attacker.level;
+			//}
 
-			if (defender.isMonster) {
-				def = def + 2 * defender.level;
-			}
+			//if (defender.isMonster) {
+			//	def = def + 2 * defender.level;
+			//}
 			var dmg = window.utils.calculateHit(att, def, attackerRoll);
 
 			if (dmg > 0) {
