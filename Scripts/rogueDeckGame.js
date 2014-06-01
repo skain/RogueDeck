@@ -160,7 +160,7 @@
 
 		self.lootCards = (function (deck) {
 			var self = {};
-			self.getRandomLootCard = function (gameLevel) {
+			self.getRandomLootCard = function (level) {
 				var type, verb, value, lc;
 				var rnd = window.utils.getWeightedRandomNumber(1, 10);
 				switch (rnd) {
@@ -204,7 +204,7 @@
 					case 10:
 						//weapon or armor
 						var rnd = window.utils.getRandomNumberBetween(1, 2);
-						var tier = window.utils.getDownwardWeightedRandomNumber(1, 5, gameLevel);
+						var tier = window.utils.getDownwardWeightedRandomNumber(1, 5, level);
 						if (rnd == 1) {
 							//weapon
 							var weapon = null;
@@ -527,7 +527,8 @@
 		self.hitPoints = ko.observable(hitPoints || 1);
 		self.isMonster = true;
 		self.setImageUrl(self.name());
-		self.level = level;
+		self.level = ko.observable(level);
+		self.exp = Math.floor((self.attack() + self.defense() + self.hitPoints()) / 6); //avg / 2
 		return self;
 	}
 
@@ -570,7 +571,7 @@
 		}
 
 		self.addMonsterDrop = function (monster) {
-			var lc = deck.lootCards.getRandomLootCard(monster.level);
+			var lc = deck.lootCards.getRandomLootCard(monster.level());
 			lc.droppedBy = monster.name() + ' dropped a ';
 			self.loot.push(lc);
 		}
@@ -659,6 +660,14 @@
 			return att;
 		});
 		self.isPlayer = true;
+		self.exp = ko.observable(0);
+		self.level = ko.computed(function () {
+			var comp = Math.floor((Math.log(self.exp() + 1) * 1.3) / 2);
+			if (comp < 1) {
+				comp = 1;
+			}
+			return comp;
+		});
 		self.useLootCard = function (lootCard) {
 			if (self.lootCards.indexOf(lootCard) < 0) {
 				window.rogueGame.addMessageToLog('You can\'t use that loot card!');
@@ -821,17 +830,9 @@
 
 		var processAttack = function (attacker, defender) {
 			var attackerRoll = window.utils.getRandomNumber(10);
-			var att = attacker.attack();
-			var def = defender.defense();
+			var att = attacker.attack() + 2 * attacker.level();
+			var def = defender.defense() + 2 * defender.level();
 
-			//I don't think I need this anymore since monsters get harder by tier now...
-			//if (attacker.isMonster) {
-			//	att = att + 2 * attacker.level;
-			//}
-
-			//if (defender.isMonster) {
-			//	def = def + 2 * defender.level;
-			//}
 			var dmg = window.utils.calculateHit(att, def, attackerRoll);
 
 			if (dmg > 0) {
@@ -859,7 +860,7 @@
 		var processTurnCompletion = function () {
 			processMonsterTurns();
 			self.player().stomach(self.player().stomach() - 1);
-			if (processEndGame()) {
+			if (!processEndGame()) {
 				if (self.player().stomach() < 1) {
 					self.addMessageToLog('You are hungry! (-1 HP)');
 					self.player().hitPoints(self.player().hitPoints() - 1);
@@ -932,6 +933,7 @@
 			processAttack(self.player(), monster);
 			if (monster.hitPoints() < 1) {
 				self.addMessageToLog('You killed the ' + monster.type);
+				self.player().exp(self.player().exp() + monster.exp);
 				self.currentAreaCard().monsters.remove(monster);
 				self.currentAreaCard().addMonsterDrop(monster);
 			}

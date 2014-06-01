@@ -54,7 +54,7 @@
 					<div class="row">
 						<div class="col-xs-4">
 							<h4><span data-bind="text:type"></span></h4>
-							<div><em data-bind="text: 'Level: ' + level"></em></div>
+							<div><em data-bind="text: 'Level: ' + level()"></em></div>
 							<div>
 								Att: <span data-bind="text: attack"></span>, Def: <span data-bind="text:defense"></span>
 							</div>
@@ -88,8 +88,16 @@
 		</div>
 		<div class="row" data-bind="with:player">
 			<div class="col-med-12 col-lg-4" id="PlayerDiv">
-				<h3>Player: <span data-bind="text: name"></span></h3>
+				<h3>Player</h3>
 				<div class="card">
+					<div class="row">
+						<div class="col-sm-6">
+							<strong data-bind="text: name"></strong>
+						</div>
+						<div class="col-sm-6">
+							<em data-bind="text: 'Lvl: ' + level()"></em>
+						</div>
+					</div>
 					<div class="row">
 						<div class="col-sm-6">
 							<h4>Stats</h4>
@@ -109,6 +117,10 @@
 								<tr>
 									<th>Vitality</th>
 									<td data-bind="text: vitality"></td>
+								</tr>
+								<tr>
+									<th>Experience</th>
+									<td data-bind="text: exp"></td>
 								</tr>
 							</table>
 							<div data-bind="visible: rogueGame.stepsTaken() < 1">
