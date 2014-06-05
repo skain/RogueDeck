@@ -60,6 +60,7 @@
     <Content Include="index.htm" />
     <Content Include="RogueDeck.htm" />
     <Content Include="Scripts\bootstrap-growl.min.js" />
+    <Content Include="Scripts\bsKOModal.js" />
     <Content Include="Scripts\rogueDeckDictionary.js" />
     <Content Include="Scripts\rogueDeckGame.js" />
     <Content Include="Scripts\utils.js" />

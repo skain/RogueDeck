@@ -19,179 +19,196 @@
 			<li><a href="#EquippedDiv">E</a></li>
 		</ul>
 	</div>
-	<div class="container">
-		<div id="AlertDiv">
-			<div id="AlertMsg"></div>
-			<button data-bind="click: startNewGame">OK</button>
-		</div>
-		<div class="row">
-			<h1 style="float:left; margin-right: 10px;">RogueDeck</h1>
-		</div>
-		<div class="row" data-bind="with: currentAreaCard">
-			<div class="col-med-12 col-lg-4" id="AreaDiv">
-				<h3>Area</h3>
-				<div class="card">
-					<h4>Steps: <span data-bind="text: window.rogueGame.stepsTaken"></span>/Level: <span data-bind="text: window.rogueGame.gameLevel"></span></h4>
-					<div>
-						<h4>You are in a <span data-bind="text: sizeText"></span> <span data-bind="text: type"></span></h4>
-						<!--<ul class="doorsList" data-bind="foreach: doors, css: { disabled: monsters().length > 0 }">-->
-						<ul class="doorsList" data-bind="foreach: doors">
-							<li>There is a door to the <a href="javascript:void(0);" data-bind="text: direction, click:window.rogueGame.tryMoveToNewArea"></a></li>
-						</ul>
-						<div id="MonsterBlockDiv" data-bind="visible: monsters().length > 0">
-							<div class="monsterAlert">Monsters here!</div>
-							<div class="runDiv">
-								<button class="btn btn-danger" data-bind="click: window.rogueGame.runFromArea">Run!</button>
+	<div id="RogueGameDiv">
+		<div class="container">
+			<div id="AlertDiv">
+				<div id="AlertMsg"></div>
+				<button data-bind="click: startNewGame">OK</button>
+			</div>
+			<div class="row">
+				<h1 style="float:left; margin-right: 10px;">RogueDeck</h1>
+			</div>
+			<div class="row" data-bind="with: currentAreaCard">
+				<div class="col-med-12 col-lg-4" id="AreaDiv">
+					<h3>Area</h3>
+					<div class="card">
+						<h4>Steps: <span data-bind="text: window.rogueGame.stepsTaken"></span>/Level: <span data-bind="text: window.rogueGame.gameLevel"></span></h4>
+						<div>
+							<h4>You are in a <span data-bind="text: sizeText"></span> <span data-bind="text: type"></span></h4>
+							<!--<ul class="doorsList" data-bind="foreach: doors, css: { disabled: monsters().length > 0 }">-->
+							<ul class="doorsList" data-bind="foreach: doors">
+								<li>There is a door to the <a href="javascript:void(0);" data-bind="text: direction, click:window.rogueGame.tryMoveToNewArea"></a></li>
+							</ul>
+							<div id="MonsterBlockDiv" data-bind="visible: monsters().length > 0">
+								<div class="monsterAlert">Monsters here!</div>
+								<div class="runDiv">
+									<button class="btn btn-danger" data-bind="click: window.rogueGame.runFromArea">Run!</button>
+								</div>
 							</div>
 						</div>
 					</div>
 				</div>
-			</div>
-			<div class="col-med-12 col-lg-4" id="MonstersDiv">
-				<h3>Monsters</h3>
-				<!-- ko foreach: monsters -->
-				<div class="card">
-					<div class="row">
-						<div class="col-xs-4">
-							<h4><span data-bind="text:type"></span></h4>
-							<div><em data-bind="text: 'Level: ' + level()"></em></div>
-							<div>
-								Att: <span data-bind="text: attack"></span>, Def: <span data-bind="text:defense"></span>
-							</div>
-							<div>
-								HP: <span data-bind="text: hitPoints"></span>
-							</div>
-							<div>
-								<a href="javascript:void(0);" data-bind="click: window.rogueGame.processPlayerAttack">Attack!</a>
-							</div>
-						</div>
-						<div class="col-xs-8 cardImgDiv">
-							<img class="itemImg" data-bind="attr: { src: imageUrl }" />
-						</div>
-					</div>
-				</div>
-				<!-- /ko -->
-			</div>
-			<div class="col-med-12 col-lg-4" id="LootDiv">
-				<h3>Loot</h3>
-				<ul class="lootList" data-bind="foreach: loot">
-					<li>
+				<div class="col-med-12 col-lg-4" id="MonstersDiv">
+					<h3>Monsters</h3>
+					<!-- ko foreach: monsters -->
+					<div class="card">
 						<div class="row">
-							<div class="col-sm-6" data-bind="text: droppedBy"></div>
-							<div class="col-sm-6 lootCardVerbs"><a href="javascript:void(0);" data-bind="click:window.rogueGame.takeItem">Take</a></div>
-						</div>
-						<div class="row" data-bind="template: { name: 'LootCardTemplate', data: $data }">
-						</div>
-					</li>
-				</ul>
-			</div>
-		</div>
-		<div class="row" data-bind="with:player">
-			<div class="col-med-12 col-lg-4" id="PlayerDiv">
-				<h3>Player</h3>
-				<div class="card">
-					<div class="row">
-						<div class="col-sm-6">
-							<strong data-bind="text: name"></strong>
-						</div>
-						<div class="col-sm-6">
-							<em data-bind="text: 'Lvl: ' + level()"></em>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-sm-6">
-							<h4>Stats</h4>
-							<table>
-								<tr>
-									<th>Strength</th>
-									<td data-bind="text: strength"></td>
-								</tr>
-								<tr>
-									<th>Intelligence</th>
-									<td data-bind="text: intelligence"></td>
-								</tr>
-								<tr>
-									<th>Dexterity</th>
-									<td data-bind="text: dexterity"></td>
-								</tr>
-								<tr>
-									<th>Vitality</th>
-									<td data-bind="text: vitality"></td>
-								</tr>
-								<tr>
-									<th>Experience</th>
-									<td data-bind="text: exp"></td>
-								</tr>
-							</table>
-							<div data-bind="visible: rogueGame.stepsTaken() < 1">
-								<input type="button" value="Re-roll" data-bind="click: rogueGame.rerollCharacter" />
+							<div class="col-xs-4">
+								<h4><span data-bind="text:type"></span></h4>
+								<div><em data-bind="text: 'Level: ' + level()"></em></div>
+								<div>
+									Att: <span data-bind="text: attack"></span>, Def: <span data-bind="text:defense"></span>
+								</div>
+								<div>
+									HP: <span data-bind="text: hitPoints"></span>
+								</div>
+								<div>
+									<a href="javascript:void(0);" data-bind="click: window.rogueGame.processPlayerAttack">Attack!</a>
+								</div>
+							</div>
+							<div class="col-xs-8 cardImgDiv">
+								<img class="itemImg" data-bind="attr: { src: imageUrl }" />
 							</div>
 						</div>
-						<div class="col-sm-6">
-							<div data-bind="css: { statusAlert: hitPoints() < 12 || stomach() < 12 }">
-								<h4>Vitals</h4>
+					</div>
+					<!-- /ko -->
+				</div>
+				<div class="col-med-12 col-lg-4" id="LootDiv">
+					<h3>Loot</h3>
+					<ul class="lootList" data-bind="foreach: loot">
+						<li>
+							<div class="row">
+								<div class="col-sm-6" data-bind="text: droppedBy"></div>
+								<div class="col-sm-6 lootCardVerbs"><a href="javascript:void(0);" data-bind="click:window.rogueGame.takeItem">Take</a></div>
+							</div>
+							<div class="row" data-bind="template: { name: 'LootCardTemplate', data: $data }">
+							</div>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div class="row" data-bind="with:player">
+				<div class="col-med-12 col-lg-4" id="PlayerDiv">
+					<h3>Player</h3>
+					<div class="card">
+						<div class="row">
+							<div class="col-sm-6">
+								<strong data-bind="text: name"></strong>
+							</div>
+							<div class="col-sm-6">
+								<em data-bind="text: 'Lvl: ' + level()"></em>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-sm-6">
+								<h4>Stats</h4>
 								<table>
-									<tr data-bind="css: { statusAlert: hitPoints() < 12 }">
-										<th>Hit Points</th>
-										<td><span data-bind="text:hitPoints"></span>(/<span data-bind="text:maxHitPoints"></span>)</td>
+									<tr>
+										<th>Strength</th>
+										<td data-bind="text: strength"></td>
 									</tr>
-									<tr data-bind="css: { statusAlert: stomach() < 12 }">
-										<th>Stomach</th>
-										<td><span data-bind="text:stomach"></span>(/<span data-bind="text:maxStomach"></span>)</td>
+									<tr>
+										<th>Intelligence</th>
+										<td data-bind="text: intelligence"></td>
+									</tr>
+									<tr>
+										<th>Dexterity</th>
+										<td data-bind="text: dexterity"></td>
+									</tr>
+									<tr>
+										<th>Vitality</th>
+										<td data-bind="text: vitality"></td>
+									</tr>
+									<tr>
+										<th>Experience</th>
+										<td data-bind="text: exp"></td>
 									</tr>
 								</table>
+								<div data-bind="visible: rogueGame.stepsTaken() < 1">
+									<input type="button" value="Re-roll" data-bind="click: rogueGame.rerollCharacter" />
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div data-bind="css: { statusAlert: hitPoints() < 12 || stomach() < 12 }">
+									<h4>Vitals</h4>
+									<table>
+										<tr data-bind="css: { statusAlert: hitPoints() < 12 }">
+											<th>Hit Points</th>
+											<td><span data-bind="text:hitPoints"></span>(/<span data-bind="text:maxHitPoints"></span>)</td>
+										</tr>
+										<tr data-bind="css: { statusAlert: stomach() < 12 }">
+											<th>Stomach</th>
+											<td><span data-bind="text:stomach"></span>(/<span data-bind="text:maxStomach"></span>)</td>
+										</tr>
+									</table>
+								</div>
 							</div>
 						</div>
 					</div>
 				</div>
+				<div class="col-med-12 col-lg-4" id="InventoryDiv">
+					<h3>Inventory</h3>
+					<ul class="lootList" data-bind="foreach: lootCards">
+						<li>
+							<div class="row">
+								<div class="col-sm-12 lootCardVerbs">[<a href="javascript:void(0);" data-bind="text: verb, click:window.rogueGame.useItem"></a>] [<a href="javascript:void(0);" data-bind="click:window.rogueGame.dropItem">drop</a>]</div>
+							</div>
+							<div class="row" data-bind="template: { name: 'LootCardTemplate', data: $data }">
+							</div>
+						</li>
+					</ul>
+				</div>
+				<div class="col-med-12 col-lg-4" id="EquippedDiv">
+					<h3>Equipped</h3>
+					<ul class="lootList">
+						<li>
+							<div class="row">
+								<div class="col-sm-6"><strong>Right-Hand:</strong></div>
+							</div>
+							<div class="row" data-bind="template: { name: 'LootCardTemplate', data: weapon }">
+							</div>
+						</li>
+						<li>
+							<div class="row">
+								<div class="col-sm-6"><strong>Armor:</strong></div>
+							</div>
+							<div class="row" data-bind="template: { name: 'LootCardTemplate', data: armor }">
+							</div>
+						</li>
+					</ul>
+				</div>
 			</div>
-			<div class="col-med-12 col-lg-4" id="InventoryDiv">
-				<h3>Inventory</h3>
-				<ul class="lootList" data-bind="foreach: lootCards">
-					<li>
-						<div class="row">
-							<div class="col-sm-12 lootCardVerbs">[<a href="javascript:void(0);" data-bind="text: verb, click:window.rogueGame.useItem"></a>] [<a href="javascript:void(0);" data-bind="click:window.rogueGame.dropItem">drop</a>]</div>
-						</div>
-						<div class="row" data-bind="template: { name: 'LootCardTemplate', data: $data }">
-						</div>
-					</li>
-				</ul>
+			<div class="row" id="MessageLogDiv" data-bind="foreach: messageLog">
+				<div data-bind="attr: { class: 'alert alert-' + $data.level }">
+					<div class="col-sm-1"></div><div class="col-sm-11"><span data-bind="text:$data.message"></span></div><div style="clear: both"></div>
+				</div>
 			</div>
-			<div class="col-med-12 col-lg-4" id="EquippedDiv">
-				<h3>Equipped</h3>
-				<ul class="lootList">
-					<li>
-						<div class="row">
-							<div class="col-sm-6"><strong>Right-Hand:</strong></div>
-						</div>
-						<div class="row" data-bind="template: { name: 'LootCardTemplate', data: weapon }">
-						</div>
-					</li>
-					<li>
-						<div class="row">
-							<div class="col-sm-6"><strong>Armor:</strong></div>
-						</div>
-						<div class="row" data-bind="template: { name: 'LootCardTemplate', data: armor }">
-						</div>
-					</li>
-				</ul>
+			<div class="row" data-bind="visible: messageLog().length > 0">
+				<a href="javascript:void(0)" data-bind="click: window.rogueGame.clearMessageLog">Clear all messages</a>
 			</div>
-		</div>
-		<div class="row" id="MessageLogDiv" data-bind="foreach: messageLog">
-			<div data-bind="attr: { class: 'alert alert-' + $data.level }">
-				<div class="col-sm-1"></div><div class="col-sm-11"><span data-bind="text:$data.message"></span></div><div style="clear: both"></div>
-			</div>
-		</div>
-		<div class="row" data-bind="visible: messageLog().length > 0">
-			<a href="javascript:void(0)" data-bind="click: window.rogueGame.clearMessageLog">Clear all messages</a>
 		</div>
 	</div>
 	<div id="GoogleBranding"></div>
+	<!-- Shared Modal Definition-->
+	<div class="modal fade" id="PageModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title" data-bind="text: title"></h4>
+				</div>
+				<div data-bind="template: { name: templateName(), data: modalContent }">
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- End Shared Modal -->
 	<script src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
 	<script src="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 	<script src="https://ajax.aspnetcdn.com/ajax/knockout/knockout-3.0.0.js"></script>
 	<script src="./Scripts/bootstrap-growl.min.js"></script>
 	<script src="https://www.google.com/jsapi"></script>
+	<script src="./Scripts/bsKOModal.js"></script>
 	<script src="./scripts/utils.js"></script>
 	<script src="./scripts/rogueDeckDictionary.js"></script>
 	<script src="./scripts/rogueDeckGame.js"></script>
@@ -199,7 +216,7 @@
 		google.load('search', '1');
 		$(document).ready(function () {
 			rogueGame.startGameAndGetFirstRoom();
-			ko.applyBindings(window.rogueGame);
+			ko.applyBindings(window.rogueGame, $('#RogueGameDiv')[0]);
 		});
 	</script>
 	<!-- Named Templates -->
@@ -222,6 +239,24 @@
 					</div>
 				</div>
 			</div>
+		</div>
+	</script>
+
+	<!-- Modal Templates -->
+	<script id="ConfirmModalTemplate" type="text/html">
+		<div class="modal-body" data-bind="html: body">
+		</div>
+		<div class="modal-footer">
+			<button type="button" class="btn btn-default" data-dismiss="modal" data-bind="click: onCancelClick">Cancel</button>
+			<button type="button" class="btn btn-primary" data-dismiss="modal" data-bind="click: onOKClick">OK</button>
+		</div>
+	</script>
+
+	<script id="AlertModalTemplate" type="text/html">
+		<div class="modal-body" data-bind="html: body">
+		</div>
+		<div class="modal-footer">
+			<button type="button" class="btn btn-primary" data-dismiss="modal" data-bind="click: onOKClick">OK</button>
 		</div>
 	</script>
 </body>
