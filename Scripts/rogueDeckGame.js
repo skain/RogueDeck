@@ -920,9 +920,9 @@
 
 			if (gameOver) {
 				window.rogueGame.addMessageToLog(msg, logLevel);
-				var $alertDiv = $('#AlertDiv');
-				$('#AlertMsg').text(msg);
-				$alertDiv.show();
+				window.bsKOModal.showAlertModal('You have died', msg + ' Click OK to start a new game.', function () {
+					self.startNewGame();
+				});
 				$('div.container:first').addClass('disabled');
 			}
 
