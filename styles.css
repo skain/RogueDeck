@@ -169,3 +169,7 @@ div.lootCardVerbs {
 				padding: 2px 6px;
 				background-color: lightgray;
 			}
+
+#CreateCharacterDiv {
+	padding: 20px;
+}

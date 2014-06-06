@@ -816,14 +816,13 @@
 
 		self.rerollCharacter = function () {
 			self.addMessageToLog("Re-rolling character.", 'info');
-			self.startGameAndGetFirstRoom();
-		};
-		self.startGameAndGetFirstRoom = function () {
-			self.addMessageToLog("New game begun.");
-			var player = roguePlayer("Steve");
+			var player = roguePlayer("");
 			player.equipWeapon(getStartingWeapon());
 			player.equipArmor(getStartingArmor());
 			self.player(player);
+		};
+		self.startNewGame = function () {
+			self.addMessageToLog("New game begun.");
 			self.stepsTaken(0);
 			self.currentAreaCard(rogueDeck.getFirstRoomCard());
 		};
@@ -946,10 +945,6 @@
 			$('div.container:first').removeClass('disabled');
 		};
 
-		self.startNewGame = function () {
-			self.hideAlertDiv();
-			window.rogueGame.startGameAndGetFirstRoom();
-		};
 
 		self.runFromArea = function () {
 			self.addMessageToLog('You attempt to run from the area!', 'warning');
@@ -971,6 +966,9 @@
 			}
 		};
 
+		self.showCharacterCreationModal = function () {
+			window.bsKOModal.showCharacterCreationModal(self);
+		};
 		return self;
 	}
 	//end object defs

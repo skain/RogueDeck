@@ -211,7 +211,8 @@
 	<script type="text/javascript" id="PageCode">
 		google.load('search', '1');
 		$(document).ready(function () {
-			rogueGame.startGameAndGetFirstRoom();
+			rogueGame.rerollCharacter();
+			rogueGame.showCharacterCreationModal();
 			ko.applyBindings(window.rogueGame, $('#RogueGameDiv')[0]);
 		});
 	</script>
@@ -253,6 +254,58 @@
 		</div>
 		<div class="modal-footer">
 			<button type="button" class="btn btn-primary" data-dismiss="modal" data-bind="click: onOKClick">OK</button>
+		</div>
+	</script>
+
+	<script id="NewCharacterModalTemplate" type="text/html">
+		<div id="CreateCharacterDiv">
+			<div>
+				<div class="form-group">
+					<label for="CharacterName">Name</label>
+					<input type="text" class="form-control" id="CharacterName" placeholder="Enter name" data-bind="value: player().name">
+				</div>
+				<h4>Stats</h4>
+				<table>
+					<tr>
+						<th>Strength</th>
+						<td data-bind="text: player().strength"></td>
+					</tr>
+					<tr>
+						<th>Intelligence</th>
+						<td data-bind="text: player().intelligence"></td>
+					</tr>
+					<tr>
+						<th>Dexterity</th>
+						<td data-bind="text: player().dexterity"></td>
+					</tr>
+					<tr>
+						<th>Vitality</th>
+						<td data-bind="text: player().vitality"></td>
+					</tr>
+				</table>
+			</div>
+			<div>
+				<h3>Equipped</h3>
+				<ul class="lootList">
+					<li>
+						<div class="row">
+							<div class="col-sm-6"><strong>Right-Hand:</strong></div>
+						</div>
+						<div class="row" data-bind="template: { name: 'LootCardTemplate', data: player().weapon }">
+						</div>
+					</li>
+					<li>
+						<div class="row">
+							<div class="col-sm-6"><strong>Armor:</strong></div>
+						</div>
+						<div class="row" data-bind="template: { name: 'LootCardTemplate', data: player().armor }">
+						</div>
+					</li>
+				</ul>
+			</div>
+			<div>
+				<input type="button" class="btn btn-default" value="Re-roll" data-bind="click: rerollCharacter" />&nbsp;<input type="button" class="btn btn-primary" value="Start Game" data-dismiss="modal" data-bind="click: startNewGame">
+			</div>
 		</div>
 	</script>
 </body>

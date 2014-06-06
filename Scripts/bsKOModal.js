@@ -1,15 +1,22 @@
-﻿window.bsKOModal = (function (window) {
+﻿/*
+	Hint: Remember you need to set the template name before setting the modalContent for the binding to work properly!
+*/
+window.bsKOModal = (function (window) {
 	var self = {};
 
 	function baseModalModel(templateName, title) {
 		var self = {};
-		self.templateName = ko.observable(templateName || 'AlertModalTemplate');
+		self.templateName = ko.observable(templateName);
 		self.title = ko.observable(title || 'Unassigned');
 		self.modalContent = ko.observable({
 			body: 'Unassigned',
 			onOKClick: null
 		});
 		return self;
+	};
+
+	self.launchModal = function () {
+		$('#PageModal').modal();
 	};
 
 	self.showConfirmModal = function (title, body, onOKClick, onCancelClick) {
@@ -21,7 +28,7 @@
 			onCancelClick: onCancelClick
 		});
 		model.templateName('ConfirmModalTemplate');
-		$('#PageModal').modal();
+		self.launchModal();
 	};
 
 	self.showAlertModal = function (title, body, onOKClick) {
@@ -33,7 +40,7 @@
 		});
 		model.templateName('AlertModalTemplate');
 
-		$('#PageModal').modal();
+		self.launchModal();
 	}
 
 	self.modalModel = baseModalModel();
@@ -43,4 +50,15 @@
 	});
 
 	return self;
+})(window);
+
+//rogueDeck specific extensions
+(function (window) {
+	window.bsKOModal.showCharacterCreationModal = function (rogueGame) {
+		var model = window.bsKOModal.modalModel;
+		model.title('Create Characater');
+		model.modalContent(rogueGame);
+		model.templateName('NewCharacterModalTemplate');
+		window.bsKOModal.launchModal();
+	};
 })(window);
