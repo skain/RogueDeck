@@ -57,6 +57,7 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Styles\animate.css" />
     <Content Include="index.htm" />
     <Content Include="RogueDeck.htm" />
     <Content Include="Scripts\bootstrap-growl.min.js" />
@@ -67,7 +68,7 @@
     <None Include="Properties\PublishProfiles\roguedeck - FTP.pubxml" />
     <None Include="Properties\PublishProfiles\roguedeck - Web Deploy.pubxml" />
     <None Include="Scripts\_references.js" />
-    <Content Include="styles.css" />
+    <Content Include="Styles\styles.css" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
