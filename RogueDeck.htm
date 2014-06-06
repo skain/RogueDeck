@@ -6,7 +6,8 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>RogueDeck</title>
 	<link href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet" />
-	<link rel="stylesheet" type="text/css" href="styles.css" />
+	<link rel="stylesheet" type="text/css" href="styles/styles.css" />
+	<link rel="stylesheet" type="text/css" href="Styles/animate.css" />
 </head>
 <body>
 	<div id="SmallScreenNav">
@@ -47,7 +48,7 @@
 				<div class="col-med-12 col-lg-4" id="MonstersDiv">
 					<h3>Monsters</h3>
 					<!-- ko foreach: monsters -->
-					<div class="card">
+					<div class="card bounce animated" >
 						<div class="row">
 							<div class="col-xs-4">
 								<h4><span data-bind="text:type"></span></h4>
@@ -120,9 +121,6 @@
 										<td data-bind="text: exp"></td>
 									</tr>
 								</table>
-								<div data-bind="visible: rogueGame.stepsTaken() < 1">
-									<input type="button" value="Re-roll" data-bind="click: rogueGame.rerollCharacter" />
-								</div>
 							</div>
 							<div class="col-sm-6">
 								<div data-bind="css: { statusAlert: hitPoints() < 12 || stomach() < 12 }">
@@ -223,7 +221,7 @@
 
 	<script type="text/html" id="LootCardTemplate">
 		<div class="col-sm-12">
-			<div class="card">
+			<div class="card bounce animated">
 				<div class="row">
 					<div class="col-xs-6">
 						<h4><span data-bind="text:type"></span><span class="badgesSpan" data-bind="if: value && value.buffs"><span data-bind="template: { name: 'BuffsBadgesTemplate', foreach: value.buffs }"></span></span></h4>

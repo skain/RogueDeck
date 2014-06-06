@@ -21,6 +21,7 @@ window.bsKOModal = (function (window) {
 
 	self.showConfirmModal = function (title, body, onOKClick, onCancelClick) {
 		var model = self.modalModel;
+		self.clearModal();
 		model.title(title);
 		model.modalContent({
 			body: body,
@@ -33,6 +34,7 @@ window.bsKOModal = (function (window) {
 
 	self.showAlertModal = function (title, body, onOKClick) {
 		var model = self.modalModel;
+		self.clearModal();
 		model.title(title);
 		model.modalContent({
 			body: body,
@@ -41,7 +43,11 @@ window.bsKOModal = (function (window) {
 		model.templateName('AlertModalTemplate');
 
 		self.launchModal();
-	}
+	};
+
+	self.clearModal = function () {
+		window.bsKOModal.modalModel.templateName('');
+	};
 
 	self.modalModel = baseModalModel();
 
@@ -54,9 +60,11 @@ window.bsKOModal = (function (window) {
 
 //rogueDeck specific extensions
 (function (window) {
-	window.bsKOModal.showCharacterCreationModal = function (rogueGame) {
-		var model = window.bsKOModal.modalModel;
-		model.title('Create Characater');
+	var self = window.bsKOModal;
+	self.showCharacterCreationModal = function (rogueGame) {
+		var model = self.modalModel;
+		self.clearModal();
+		model.title('Create Character');
 		model.modalContent(rogueGame);
 		model.templateName('NewCharacterModalTemplate');
 		window.bsKOModal.launchModal();

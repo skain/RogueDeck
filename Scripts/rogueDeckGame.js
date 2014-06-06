@@ -822,6 +822,7 @@
 			self.player(player);
 		};
 		self.startNewGame = function () {
+			self.hideAlertDiv();
 			self.addMessageToLog("New game begun.");
 			self.stepsTaken(0);
 			self.currentAreaCard(rogueDeck.getFirstRoomCard());
@@ -920,7 +921,8 @@
 			if (gameOver) {
 				window.rogueGame.addMessageToLog(msg, logLevel);
 				window.bsKOModal.showAlertModal('You have died', msg + ' Click OK to start a new game.', function () {
-					self.startNewGame();
+					self.rerollCharacter();
+					self.showCharacterCreationModal();
 				});
 				$('div.container:first').addClass('disabled');
 			}
