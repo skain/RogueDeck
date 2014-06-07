@@ -6,7 +6,7 @@
 
 
 	.cardsDiv {
-		max-height: 296px;
+		height: 296px;
 		overflow-x: hidden;
 		overflow-y: auto;
 	}

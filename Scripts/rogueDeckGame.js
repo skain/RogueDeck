@@ -839,6 +839,9 @@
 			if (dmg > 0) {
 				//process hit
 				defender.hitPoints(defender.hitPoints() - dmg);
+				if (defender.isPlayer) {
+					bounceHP();
+				}
 				self.addMessageToLog(attacker.name() + ' hits ' + defender.name() + ' for ' + dmg + ' HP of damage.', attacker.isPlayer ? 'success' : 'danger');
 			} else {
 				//process miss
@@ -864,6 +867,7 @@
 			if (!processEndGame()) {
 				if (self.player().stomach() < 1) {
 					self.addMessageToLog('You are hungry! (-1 HP)');
+					bounceStomach();
 					self.player().hitPoints(self.player().hitPoints() - 1);
 					processEndGame();
 				}
@@ -902,6 +906,18 @@
 			self.addMessageToLog('You used the ' + lootCard.type);
 			self.player().useLootCard(lootCard);
 			processMonsterTurns();
+		};
+
+		var bounceElement = function ($element, callback) {
+			window.utils.addAnimationWithCallback($element, 'animated bounce', callback);
+		};
+
+		var bounceHP = function (callback) {
+			bounceElement($('.hitPointsContainer'), callback);
+		};
+
+		var bounceStomach = function (callback) {
+			bounceElement($('.stomachContainer'), callback);
 		};
 
 		self.dropItem = function (lootCard) {
