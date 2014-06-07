@@ -22,6 +22,20 @@
 				<li><a href="#MessageLogDiv">G</a></li>
 			</ul>
 		</div>
+		<div id="SmallScreenStats">
+			<div data-bind="css: { statusAlert: player().hitPoints() < 12 || player().stomach() < 12 }">
+				<table>
+					<tr data-bind="css: { statusAlert: player().hitPoints() < 12, hitPointsContainer: true }">
+						<th>HP:</th>
+						<td><span data-bind="text:player().hitPoints"></span>(/<span data-bind="text:player().maxHitPoints"></span>)</td>
+					</tr>
+					<tr data-bind="css: { statusAlert: player().stomach() < 12, stomachContainer: true }">
+						<th>Sto:</th>
+						<td><span data-bind="text:player().stomach"></span>(/<span data-bind="text:player().maxStomach"></span>)</td>
+					</tr>
+				</table>
+			</div>
+		</div>
 		<div class="container">
 			<div class="row">
 				<h1 style="float:left; margin-right: 10px;">RogueDeck</h1>

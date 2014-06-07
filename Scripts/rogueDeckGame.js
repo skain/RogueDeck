@@ -823,6 +823,9 @@
 		};
 		self.startNewGame = function () {
 			self.hideAlertDiv();
+			if (self.player().name() === '') {
+				self.player().name('Beauregard');
+			}
 			self.showGameDiv();
 			self.addMessageToLog("New game begun.");
 			self.stepsTaken(0);

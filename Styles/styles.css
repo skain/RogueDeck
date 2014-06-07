@@ -1,9 +1,8 @@
 
 @media screen and (min-width: 768px) and (max-width: 10024px) {
-	#SmallScreenNav {
+	#SmallScreenNav, #SmallScreenStats {
 		display: none;
 	}
-
 
 	.cardsDiv {
 		height: 296px;
@@ -108,7 +107,7 @@ div#MessageLogDiv {
 	border-radius: 6px;
 }
 
-	/*.itemImg:hover {
+/*.itemImg:hover {
 		-webkit-transform: scale(2.0);
 		z-index: 100;
 	}*/
@@ -148,7 +147,7 @@ div.lootCardVerbs {
 	padding: 10px;
 	background-color: #f0ebc5;
 	z-index: 5;
-	width: 206px;
+	width: 237px;
 	left: 0px;
 	right: 0px;
 	margin: 0 auto;
@@ -172,6 +171,18 @@ div.lootCardVerbs {
 				padding: 2px 6px;
 				background-color: lightgray;
 			}
+
+#SmallScreenStats {
+	position: fixed;
+	top: -1px;
+	left: -1px;
+	border-radius: 0 0 6px 0;
+	background-color: white;
+	z-index: 199;
+	padding: 5px;
+	border: solid 1px Gray;
+	opacity: 1;
+}
 
 #CreateCharacterDiv {
 	padding: 20px;
