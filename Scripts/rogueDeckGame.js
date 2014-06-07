@@ -912,7 +912,7 @@
 		};
 
 		var bounceElement = function ($element, callback) {
-			window.utils.addAnimationWithCallback($element, 'animated bounce', callback);
+			window.utils.addAnimationWithCallback($element, 'animated bounceLight', callback);
 		};
 
 		var bounceHP = function (callback) {

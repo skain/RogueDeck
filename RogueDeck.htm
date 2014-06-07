@@ -63,7 +63,7 @@
 				<div class="col-med-12 col-lg-4" id="MonstersDiv">
 					<h3>Monsters <span data-bind="text: monsters().length > 0 ? '(' + monsters().length + ')' : ''"></span></h3>
 					<div data-bind="foreach: monsters" class="cardsDiv">
-						<div class="card bounce animated">
+						<div class="card bounceLight animated">
 							<div class="row">
 								<div class="col-xs-4">
 									<h4><span data-bind="text:type"></span></h4>
@@ -236,7 +236,7 @@
 
 	<script type="text/html" id="LootCardTemplate">
 		<div class="col-sm-12">
-			<div class="card bounce animated">
+			<div class="card bounceLight animated">
 				<div class="row">
 					<div class="col-xs-6">
 						<h4><span data-bind="text:type"></span><span class="badgesSpan" data-bind="if: value && value.buffs"><span data-bind="template: { name: 'BuffsBadgesTemplate', foreach: value.buffs }"></span></span></h4>
