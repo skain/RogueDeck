@@ -791,23 +791,23 @@
 		self.addMessageToLog = function (msg, level) {
 			level = level || 'info';
 
-			//self.messageLog.unshift({ message: msg, level: level });
-			//if (self.messageLog().length == 7) {
-			//	self.messageLog.pop();
-			//}
-			$.growl(msg, {
-				type: level,
-				template: {
-					container: '<div class="col-md-2 alert growl-animated">'
-				},
-				position: {
-					from: "top",
-					align: "right"
-				},
-				fade_in: 800,
-				pause_on_mouseover: true,
-				delay: 3000
-			})
+			self.messageLog.unshift({ message: msg, level: level });
+			if (self.messageLog().length == 7) {
+				self.messageLog.pop();
+			}
+			//$.growl(msg, {
+			//	type: level,
+			//	template: {
+			//		container: '<div class="col-md-2 alert growl-animated">'
+			//	},
+			//	position: {
+			//		from: "top",
+			//		align: "right"
+			//	},
+			//	fade_in: 800,
+			//	pause_on_mouseover: true,
+			//	delay: 3000
+			//})
 		};
 
 		self.clearMessageLog = function () {
@@ -823,6 +823,7 @@
 		};
 		self.startNewGame = function () {
 			self.hideAlertDiv();
+			self.showGameDiv();
 			self.addMessageToLog("New game begun.");
 			self.stepsTaken(0);
 			self.currentAreaCard(rogueDeck.getFirstRoomCard());
@@ -908,7 +909,12 @@
 			self.player().lootCards.remove(lootCard);
 			self.currentAreaCard().loot.push(lootCard);
 		};
-
+		self.hideGameDiv = function () {
+			$('#RogueGameDiv').addClass('displayNone');
+		};
+		self.showGameDiv = function () {
+			$('#RogueGameDiv').removeClass('displayNone');
+		}
 		var processEndGame = function () {
 			var gameOver = false;
 			var msg, logLevel;
@@ -921,6 +927,7 @@
 			if (gameOver) {
 				window.rogueGame.addMessageToLog(msg, logLevel);
 				window.bsKOModal.showAlertModal('You have died', msg + ' Click OK to start a new game.', function () {
+					self.hideGameDiv();
 					self.rerollCharacter();
 					self.showCharacterCreationModal();
 				});

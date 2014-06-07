@@ -64,7 +64,7 @@ window.bsKOModal = (function (window) {
 	self.showCharacterCreationModal = function (rogueGame) {
 		var model = self.modalModel;
 		self.clearModal();
-		model.title('Create Character');
+		model.title('Welcome to RogueDeck!');
 		model.modalContent(rogueGame);
 		model.templateName('NewCharacterModalTemplate');
 		window.bsKOModal.launchModal();

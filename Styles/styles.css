@@ -3,6 +3,13 @@
 	#SmallScreenNav {
 		display: none;
 	}
+
+
+	.cardsDiv {
+		max-height: 296px;
+		overflow-x: hidden;
+		overflow-y: auto;
+	}
 }
 
 
@@ -96,19 +103,15 @@ div#MessageLogDiv {
 	min-width: 40px;
 	min-height: 35px;
 	position: relative;
-	transition: 0.5s ease;
 	-webkit-transition: 0.5s ease;
-	-moz-transition: 0.5s ease;
 	box-shadow: rgba(0,0,0,0.5) 0px 0px 9px;
 	border-radius: 6px;
 }
 
-	.itemImg:hover {
+	/*.itemImg:hover {
 		-webkit-transform: scale(2.0);
-		-moz-transform: scale(2.0);
-		transform: scale(2.0);
-		z-index: 10;
-	}
+		z-index: 100;
+	}*/
 
 #MonstersDiv .itemImg {
 	max-height: 99px;
@@ -172,4 +175,8 @@ div.lootCardVerbs {
 
 #CreateCharacterDiv {
 	padding: 20px;
+}
+
+.displayNone {
+	display: none;
 }
